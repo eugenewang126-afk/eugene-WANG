@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+*.py
+test_selectors.js
+
+# Screenshots
+screenshot*.png
+sec_*.png
+
+# Raw/intermediate files
+styles_raw.css
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Server
+*.log

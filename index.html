@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mars Base Alpha · 火星基地阿尔法 | Engineering Design Platform</title>
+  <meta name="description" content="火星永久基地工程设计平台 | Mars Permanent Base Engineering Design Platform — Energy · Structure · Auxiliary Systems · Inter-Network" />
+  
+  <!-- Accessibility & SEO -->
+  <meta name="theme-color" content="#c1440e" />
+  <link rel="canonical" href="https://eugenewang126-afk.github.io/eugene-WANG/" />
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Mars Base Alpha · 火星基地阿尔法" />
+  <meta property="og:description" content="火星永久基地工程设计平台 — 基于第一性原理的模块化技术框架" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_CN" />
+</head>
+<body>
+  <!-- Skip Link for Accessibility -->
+  <a href="#main-content" class="skip-link">跳转到主要内容</a>
+  
+  <!-- Stars Background Layer -->
+  <div class="stars-layer" aria-hidden="true" id="stars-container"></div>
+  
+  <!-- Navigation -->
+  <header>
+    <nav id="navbar" role="navigation" aria-label="主导航">
+      <a href="#" class="nav-logo" aria-label="Mars Base Alpha 首页">
+        <div class="nav-logo-icon" aria-hidden="true"></div>
+        <div class="nav-logo-text">
+          <span class="nav-logo-en">Mars Base Alpha</span>
+          <span class="nav-logo-zh">火星基地阿尔法</span>
+        </div>
+      </a>
+      
+      <div class="nav-links" role="menubar">
+        <a href="#overview" class="nav-link active" role="menuitem">概览</a>
+        <a href="#systems" class="nav-link" role="menuitem">系统</a>
+        <a href="#roadmap" class="nav-link" role="menuitem">路线</a>
+        <a href="#materials" class="nav-link" role="menuitem">材料</a>
+        <a href="#updates" class="nav-link" role="menuitem">动态</a>
+        <a href="#contact" class="nav-link" role="menuitem">联系</a>
+      </div>
+      
+      <div class="nav-right">
+        <div class="lang-toggle" role="group" aria-label="语言切换">
+          <button class="lang-btn active" data-lang="zh" aria-pressed="true">中文</button>
+          <button class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <div class="sys-status" role="status" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>SYSTEM ONLINE</span>
+        </div>
+      </div>
+      
+      <button class="mobile-menu-btn" aria-label="打开菜单" aria-expanded="false" aria-controls="mobile-menu">
+        ☰
+      </button>
+    </nav>
+  </header>
+  
+  <!-- Main Content -->
+  <main id="main-content">
+    
+    <!-- Hero Section -->
+    <section id="hero" aria-labelledby="hero-title">
+      <div class="hero-mars-planet" aria-hidden="true"></div>
+      
+      <div class="hero-badge">
+        <span class="hero-badge-dot" aria-hidden="true"></span>
+        <span>Mars Permanent Base Engineering Platform</span>
+      </div>
+      
+      <h1 id="hero-title" class="hero-title">
+        <span class="hero-title-en">Mars Base Alpha</span>
+        <span class="hero-title-zh">火星基地阿尔法</span>
+      </h1>
+      
+      <p class="hero-subtitle">
+        基于第一性原理构建的模块化火星基地技术框架，涵盖<strong>能源供应</strong>、<strong>通信系统</strong>、<strong>材料结构</strong>和<strong>辅助网络</strong>四大核心模块的完整工程设计方案。
+      </p>
+      
+      <div class="hero-cta-group" role="group" aria-label="主要操作">
+        <a href="#systems" class="btn-primary">
+          <span aria-hidden="true">⚡</span> 探索系统设计
+        </a>
+        <a href="#overview" class="btn-secondary">
+          <span aria-hidden="true">📄</span> 查看技术框架
+        </a>
+      </div>
+      
+      <div class="hero-stats" role="region" aria-label="关键数据">
+        <div class="stat-item">
+          <span class="stat-value">4</span>
+          <span class="stat-label">核心模块</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">3</span>
+          <span class="stat-label">轨道层级</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">40+</span>
+          <span class="stat-label">kWe 基线功率</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">240</span>
+          <span class="stat-label">mSv/yr 辐射约束</span>
+        </div>
+      </div>
+      
+      <div class="scroll-hint" aria-hidden="true">
+        <span>SCROLL</span>
+        <div class="scroll-arrow"></div>
+      </div>
+    </section>
+    
+    <!-- Overview Section -->
+    <section id="overview" aria-labelledby="overview-title">
+      <div class="section-container">
+        <header class="section-header">
+          <span class="section-tag">Framework Overview</span>
+          <h2 id="overview-title" class="section-title">
+            <span class="en">Technical Framework</span>
+            <span class="zh">技术框架概览</span>
+          </h2>
+          <p class="section-desc">
+            基于火星环境参数和第一性原理，构建模块化、可扩展的火星基地设计框架。
+            每个模块独立优化，支持快速集成与规模扩展。
+          </p>
+        </header>
+        
+        <div class="module-grid">
+          <!-- Energy Module -->
+          <article class="module-card" tabindex="0" style="--card-accent: linear-gradient(90deg, #eab308, #f59e0b); --card-glow: rgba(234, 179, 8, 0.08);">
+            <div class="module-card-header">
+              <div class="module-icon-wrap" style="--icon-bg: rgba(234, 179, 8, 0.12); --icon-border: rgba(234, 179, 8, 0.25);">
+                <span aria-hidden="true">⚡</span>
+              </div>
+              <div class="module-trl">
+                <span class="trl-label">TRL</span>
+                <div class="trl-bar" aria-label="技术成熟度: 6/9">
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+            <span class="module-section-id">Section 3.1</span>
+            <h3 class="module-title-en">Energy Supply Module</h3>
+            <p class="module-title-zh">能源供应模块</p>
+            <p class="module-desc">
+              三轨并行发电架构：核裂变地表电源（基荷主力）+ 原位气体热电转换 + 太阳能光伏（弹性补充），确保40kWe基线功率全天候供应。
+            </p>
+            <div class="module-tags">
+              <span class="module-tag">Fission Surface Power</span>
+              <span class="module-tag">CO₂ Thermoelectric</span>
+              <span class="module-tag">Solar PV</span>
+            </div>
+          </article>
+          
+          <!-- Communication Module -->
+          <article class="module-card" tabindex="0" style="--card-accent: linear-gradient(90deg, #3b82f6, #1d4ed8); --card-glow: rgba(59, 130, 246, 0.08);">
+            <div class="module-card-header">
+              <div class="module-icon-wrap" style="--icon-bg: rgba(59, 130, 246, 0.12); --icon-border: rgba(59, 130, 246, 0.25);">
+                <span aria-hidden="true">📡</span>
+              </div>
+              <div class="module-trl">
+                <span class="trl-label">TRL</span>
+                <div class="trl-bar" aria-label="技术成熟度: 5/9">
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+            <span class="module-section-id">Section 3.2</span>
+            <h3 class="module-title-en">Communication System</h3>
+            <p class="module-title-zh">通信系统模块</p>
+            <p class="module-desc">
+              基于Starlink底层逻辑的MarsLink星座设计：三层轨道架构（LMO/MO/ArSO）+ 激光星间链路 + 全双工自主建链协议。
+            </p>
+            <div class="module-tags">
+              <span class="module-tag">MarsLink Constellation</span>
+              <span class="module-tag">Laser ISL</span>
+              <span class="module-tag">SDN</span>
+            </div>
+          </article>
+          
+          <!-- Materials Module -->
+          <article class="module-card" tabindex="0" style="--card-accent: linear-gradient(90deg, #c1440e, #e8621a); --card-glow: rgba(193, 68, 14, 0.08);">
+            <div class="module-card-header">
+              <div class="module-icon-wrap" style="--icon-bg: rgba(193, 68, 14, 0.12); --icon-border: rgba(193, 68, 14, 0.25);">
+                <span aria-hidden="true">🏗️</span>
+              </div>
+              <div class="module-trl">
+                <span class="trl-label">TRL</span>
+                <div class="trl-bar" aria-label="技术成熟度: 4/9">
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+            <span class="module-section-id">Section 3.3</span>
+            <h3 class="module-title-en">Materials & Structure</h3>
+            <p class="module-title-zh">材料与结构模块</p>
+            <p class="module-desc">
+              五轨并行材料路线：火星壤纤维增强 + 硫磺混凝土 + StarCrete + 地聚合物 + 冷烧结陶瓷，实现原位资源最大化利用。
+            </p>
+            <div class="module-tags">
+              <span class="module-tag">ISRU Materials</span>
+              <span class="module-tag">Sulfur Concrete</span>
+              <span class="module-tag">Radiation Shielding</span>
+            </div>
+          </article>
+          
+          <!-- Auxiliary Systems Module -->
+          <article class="module-card" tabindex="0" style="--card-accent: linear-gradient(90deg, #22c55e, #16a34a); --card-glow: rgba(34, 197, 94, 0.08);">
+            <div class="module-card-header">
+              <div class="module-icon-wrap" style="--icon-bg: rgba(34, 197, 94, 0.12); --icon-border: rgba(34, 197, 94, 0.25);">
+                <span aria-hidden="true">🔗</span>
+              </div>
+              <div class="module-trl">
+                <span class="trl-label">TRL</span>
+                <div class="trl-bar" aria-label="技术成熟度: 4/9">
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot filled" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                  <span class="trl-dot" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+            <span class="module-section-id">Section 3.4</span>
+            <h3 class="module-title-en">Auxiliary Systems & Network</h3>
+            <p class="module-title-zh">辅助系统及互联网络</p>
+            <p class="module-desc">
+              四层自治金字塔架构：执行层→协调层→规划层→决策层，实现3-22分钟通信时延下的完全自主运行。
+            </p>
+            <div class="module-tags">
+              <span class="module-tag">Autonomous Control</span>
+              <span class="module-tag">Edge Computing</span>
+              <span class="module-tag">IoT Mesh</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    
+    <hr class="section-divider" aria-hidden="true" />
+    
+    <!-- Systems Section -->
+    <section id="systems" aria-labelledby="systems-title">
+      <div class="section-container">
+        <header class="section-header">
+          <span class="section-tag">Core Systems</span>
+          <h2 id="systems-title" class="section-title">
+            <span class="en">Engineering Systems</span>
+            <span class="zh">工程系统详解</span>
+          </h2>
+        </header>
+        
+        <div class="systems-layout">
+          <!-- Systems Navigation -->
+          <nav class="systems-nav" aria-label="系统导航">
+            <h3 class="sys-nav-title">SYSTEM MODULES</h3>
+            <button class="sys-nav-item active" data-panel="energy" aria-current="true">
+              <span class="sys-nav-icon" aria-hidden="true">⚡</span>
+              <div class="sys-nav-text">
+                <span class="sys-nav-name-en">Energy Supply</span>
+                <span class="sys-nav-name-zh">能源供应</span>
+              </div>
+              <span class="sys-panel-arrow" aria-hidden="true">›</span>
+            </button>
+            <button class="sys-nav-item" data-panel="communication">
+              <span class="sys-nav-icon" aria-hidden="true">📡</span>
+              <div class="sys-nav-text">
+                <span class="sys-nav-name-en">Communication</span>
+                <span class="sys-nav-name-zh">通信系统</span>
+              </div>
+              <span class="sys-panel-arrow" aria-hidden="true">›</span>
+            </button>
+            <button class="sys-nav-item" data-panel="materials">
+              <span class="sys-nav-icon" aria-hidden="true">🏗️</span>
+              <div class="sys-nav-text">
+                <span class="sys-nav-name-en">Materials</span>
+                <span class="sys-nav-name-zh">材料结构</span>
+              </div>
+              <span class="sys-panel-arrow" aria-hidden="true">›</span>
+            </button>
+            <button class="sys-nav-item" data-panel="network">
+              <span class="sys-nav-icon" aria-hidden="true">🔗</span>
+              <div class="sys-nav-text">
+                <span class="sys-nav-name-en">Network</span>
+                <span class="sys-nav-name-zh">辅助网络</span>
+              </div>
+              <span class="sys-panel-arrow" aria-hidden="true">›</span>
+            </button>
+          </nav>
+          
+          <!-- Systems Content -->
+          <div class="sys-content-area">
+            
+            <!-- Energy Panel -->
+            <article id="panel-energy" class="sys-panel active" aria-labelledby="panel-energy-title">
+              <div class="sys-panel-hero" data-icon="⚡">
+                <div class="sys-panel-title-row">
+                  <div class="sys-panel-icon" aria-hidden="true">⚡</div>
+                  <div class="sys-panel-title-text">
+                    <span class="panel-section">Section 3.1</span>
+                    <h2 id="panel-energy-title">Energy Supply Module</h2>
+                    <p class="panel-zh">能源供应模块</p>
+                  </div>
+                </div>
+                <p class="sys-panel-desc">
+                  火星能源系统是一套由火星物理约束方程唯一决定的全新工程解。基于第一性原理，构建三轨并行、互为备份的发电架构，确保全天候、不间断的电力供应。
+                </p>
+              </div>
+              
+              <div class="metrics-strip" role="region" aria-label="关键指标">
+                <div class="metric-card">
+                  <span class="metric-value">40<span class="metric-unit">kWe</span></span>
+                  <span class="metric-label-en">Baseline Power</span>
+                  <span class="metric-label-zh">基线功率</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">2<span class="metric-unit">MWe</span></span>
+                  <span class="metric-label-en">Full Scale</span>
+                  <span class="metric-label-zh">满负荷规模</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">25-30<span class="metric-unit">%</span></span>
+                  <span class="metric-label-en">Stirling Efficiency</span>
+                  <span class="metric-label-zh">斯特林效率</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">≥50<span class="metric-unit">m</span></span>
+                  <span class="metric-label-en">Reactor Distance</span>
+                  <span class="metric-label-zh">反应堆安全距离</span>
+                </div>
+              </div>
+              
+              <div class="sub-cards">
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">☢️</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Track A: Fission Surface Power</span>
+                      <span class="zh">核裂变地表电源</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">
+                    NASA/DOE联合推进的FSP项目，利用铀-235受控裂变提供全天候基荷电力。输出功率独立于太阳辐照度、尘暴和昼夜循环，是火星唯一可靠的高功率密度解决方案。
+                  </p>
+                  <ul class="sub-card-list">
+                    <li>热功率: 400 kWth</li>
+                    <li>电功率: 40 kWe</li>
+                    <li>工作温度: 800-1000K</li>
+                    <li>设计寿命: 10+ 年</li>
+                  </ul>
+                </article>
+                
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">🔄</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Track B: In-Situ Thermoelectric</span>
+                      <span class="zh">原位气体热电转换</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">
+                    利用火星大气中的CO₂作为工作介质，通过热电转换实现能量转化。中科大研究表明CO₂工质比传统稀有气体效率提升7.4%-20.0%，功率密度提升1.0%-14.2%。
+                  </p>
+                  <ul class="sub-card-list">
+                    <li>介质: 火星大气CO₂ (95%+)</li>
+                    <li>温度驱动: 昼夜温差</li>
+                    <li>ISRU优势: 零运输成本</li>
+                    <li>功率范围: 10-100 kWe</li>
+                  </ul>
+                </article>
+                
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">☀️</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Track C: Solar Photovoltaic</span>
+                      <span class="zh">太阳能光伏</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">
+                    弹性补充电源，结合尘暴监测系统智能调度。火星太阳能辐照度约为地球的43%，需配合高效储能系统实现昼夜循环供电。
+                  </p>
+                  <ul class="sub-card-list">
+                    <li>辐照度: ~590 W/m²</li>
+                    <li>尘暴衰减: 最多99%</li>
+                    <li>功率范围: 5-20 kWe</li>
+                    <li>功能: 弹性补充 + 峰值削峰</li>
+                  </ul>
+                </article>
+              </div>
+            </article>
+            
+            <!-- Communication Panel -->
+            <article id="panel-communication" class="sys-panel" aria-labelledby="panel-comm-title" hidden>
+              <div class="sys-panel-hero" data-icon="📡">
+                <div class="sys-panel-title-row">
+                  <div class="sys-panel-icon" aria-hidden="true">📡</div>
+                  <div class="sys-panel-title-text">
+                    <span class="panel-section">Section 3.2</span>
+                    <h2 id="panel-comm-title">Communication System</h2>
+                    <p class="panel-zh">通信系统模块</p>
+                  </div>
+                </div>
+                <p class="sys-panel-desc">
+                  基于Starlink技术底层逻辑的MarsLink星座设计，重新定义火星空间网络的工程范式。大规模部署摊薄成本、激光星间链路消灭地面基站依赖、SDN软件定义网络实现动态自愈。
+                </p>
+              </div>
+              
+              <div class="metrics-strip">
+                <div class="metric-card">
+                  <span class="metric-value">3<span class="metric-unit">层</span></span>
+                  <span class="metric-label-en">Orbit Shells</span>
+                  <span class="metric-label-zh">轨道层级</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">17,032<span class="metric-unit">km</span></span>
+                  <span class="metric-label-en">AreoStationary</span>
+                  <span class="metric-label-zh">火星静止轨道</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">3-22<span class="metric-unit">min</span></span>
+                  <span class="metric-label-en">Earth-Mars Delay</span>
+                  <span class="metric-label-zh">地火时延</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">112-128<span class="metric-unit">min</span></span>
+                  <span class="metric-label-en">LMO Period</span>
+                  <span class="metric-label-zh">低轨周期</span>
+                </div>
+              </div>
+              
+              <div class="sub-cards">
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">🛰️</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Shell-3: AreoStationary (ArSO)</span>
+                      <span class="zh">火星静止轨道层</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">
+                    轨道高度17,032km，3颗卫星均匀分布实现全球覆盖。主要功能：地火激光通信中继 + 全球广播。
+                  </p>
+                </article>
+                
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">🔗</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Laser Inter-Satellite Links</span>
+                      <span class="zh">激光星间链路</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">
+                    消灭地面基站依赖，实现卫星间的直接高速通信。在火星无GPS基础设施的环境下，构建完全自主的空间网络骨干。
+                  </p>
+                </article>
+                
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">🌐</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">SDN Self-Healing Network</span>
+                      <span class="zh">SDN自愈网络</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">
+                    软件定义网络实现动态路由、故障自愈。适应火星环境的不确定性（尘暴遮挡、节点失效），确保通信链路鲁棒性。
+                  </p>
+                </article>
+              </div>
+            </article>
+            
+            <!-- Materials Panel -->
+            <article id="panel-materials" class="sys-panel" aria-labelledby="panel-mat-title" hidden>
+              <div class="sys-panel-hero" data-icon="🏗️">
+                <div class="sys-panel-title-row">
+                  <div class="sys-panel-icon" aria-hidden="true">🏗️</div>
+                  <div class="sys-panel-title-text">
+                    <span class="panel-section">Section 3.3</span>
+                    <h2 id="panel-mat-title">Materials & Structure</h2>
+                    <p class="panel-zh">材料与结构模块</p>
+                  </div>
+                </div>
+                <p class="sys-panel-desc">
+                  火星材料与结构系统由火星物理化学环境方程唯一决定。重力0.38g、大气压610Pa、辐射剂量240mSv/yr和温差>80°C/Sol共同约束下的最优解。
+                </p>
+              </div>
+              
+              <div class="metrics-strip">
+                <div class="metric-card">
+                  <span class="metric-value">0.38<span class="metric-unit">g</span></span>
+                  <span class="metric-label-en">Mars Gravity</span>
+                  <span class="metric-label-zh">火星重力</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">610<span class="metric-unit">Pa</span></span>
+                  <span class="metric-label-en">Atmospheric Pressure</span>
+                  <span class="metric-label-zh">大气压</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">≥2<span class="metric-unit">m</span></span>
+                  <span class="metric-label-en">Regolith Shielding</span>
+                  <span class="metric-label-zh">壤屏蔽厚度</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">>80<span class="metric-unit">°C</span></span>
+                  <span class="metric-label-en">Daily Temperature Range</span>
+                  <span class="metric-label-zh">昼夜温差</span>
+                </div>
+              </div>
+              
+              <div class="sub-cards">
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">🧱</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Track M1: Regolith Fiber</span>
+                      <span class="zh">火星壤纤维增强</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">利用火星壤中的硅酸盐矿物制造纤维增强材料，提升结构强度。</p>
+                </article>
+                
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">🟡</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Track M2: Sulfur Concrete</span>
+                      <span class="zh">硫磺混凝土</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">利用火星大气中的硫元素，制造无水混凝土，适应火星干旱环境。</p>
+                </article>
+                
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">🥔</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Track M3: StarCrete</span>
+                      <span class="zh">StarCrete辅助胶结</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">基于淀粉粘合剂的火星混凝土方案，强度是普通混凝土的2倍。</p>
+                </article>
+              </div>
+            </article>
+            
+            <!-- Network Panel -->
+            <article id="panel-network" class="sys-panel" aria-labelledby="panel-net-title" hidden>
+              <div class="sys-panel-hero" data-icon="🔗">
+                <div class="sys-panel-title-row">
+                  <div class="sys-panel-icon" aria-hidden="true">🔗</div>
+                  <div class="sys-panel-title-text">
+                    <span class="panel-section">Section 3.4</span>
+                    <h2 id="panel-net-title">Auxiliary Systems & Network</h2>
+                    <p class="panel-zh">辅助系统及互联网络</p>
+                  </div>
+                </div>
+                <p class="sys-panel-desc">
+                  四层自治金字塔架构：执行层→协调层→规划层→决策层。在通信时延3-22分钟、无GPS基础设施、GCR辐射持续轰击、能源极度有限四重边界下，实现完全自主感知、自主决策、自主执行。
+                </p>
+              </div>
+              
+              <div class="metrics-strip">
+                <div class="metric-card">
+                  <span class="metric-value">4<span class="metric-unit">层</span></span>
+                  <span class="metric-label-en">Autonomy Layers</span>
+                  <span class="metric-label-zh">自治层级</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">ms-s<span class="metric-unit"></span></span>
+                  <span class="metric-label-en">Response Time</span>
+                  <span class="metric-label-zh">响应时间</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">100<span class="metric-unit">%</span></span>
+                  <span class="metric-label-en">Autonomous Rate</span>
+                  <span class="metric-label-zh">自主率</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">Edge<span class="metric-unit"></span></span>
+                  <span class="metric-label-en">Computing Model</span>
+                  <span class="metric-label-zh">计算模型</span>
+                </div>
+              </div>
+              
+              <div class="sub-cards">
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">⚙️</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Layer 1: Execution</span>
+                      <span class="zh">执行层</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">传感器、执行器、控制器。毫秒级响应，确定性执行。</p>
+                </article>
+                
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">🔄</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Layer 2: Coordination</span>
+                      <span class="zh">协调层</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">子系统协调、资源调度。秒级响应，优化分配。</p>
+                </article>
+                
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">📊</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Layer 3: Planning</span>
+                      <span class="zh">规划层</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">任务规划、路径优化。分钟级响应，AI辅助决策。</p>
+                </article>
+                
+                <article class="sub-card">
+                  <div class="sub-card-title">
+                    <span aria-hidden="true">🧠</span>
+                    <div class="sub-card-title-text">
+                      <span class="en">Layer 4: Decision</span>
+                      <span class="zh">决策层</span>
+                    </div>
+                  </div>
+                  <p class="sub-card-body">战略决策、异常处理。小时级响应，人机协同。</p>
+                </article>
+              </div>
+            </article>
+            
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <hr class="section-divider" aria-hidden="true" />
+    
+    <!-- Roadmap Section -->
+    <section id="roadmap" aria-labelledby="roadmap-title">
+      <div class="section-container">
+        <header class="section-header">
+          <span class="section-tag">Development Roadmap</span>
+          <h2 id="roadmap-title" class="section-title">
+            <span class="en">Mission Roadmap</span>
+            <span class="zh">任务路线图</span>
+          </h2>
+          <p class="section-desc">
+            从无人自动化阶段到人类驻留的完整发展路径，每个阶段都有明确的技术目标和里程碑。
+          </p>
+        </header>
+        
+        <div class="timeline" role="list">
+          <article class="timeline-item" role="listitem">
+            <div class="timeline-dot active" aria-hidden="true"></div>
+            <div class="timeline-card">
+              <span class="timeline-phase">Phase 1</span>
+              <h3 class="timeline-title">Unmanned Automation</h3>
+              <p class="timeline-title-zh">无人自动化阶段</p>
+              <div class="timeline-items">
+                <span class="timeline-chip">FSP部署</span>
+                <span class="timeline-chip">MarsLink组网</span>
+                <span class="timeline-chip">ISRU验证</span>
+                <span class="timeline-chip">40 kWe基线</span>
+              </div>
+            </div>
+          </article>
+          
+          <article class="timeline-item" role="listitem">
+            <div class="timeline-dot" aria-hidden="true"></div>
+            <div class="timeline-card">
+              <span class="timeline-phase">Phase 2</span>
+              <h3 class="timeline-title">Capped Mission</h3>
+              <p class="timeline-title-zh">短期有人驻留</p>
+              <div class="timeline-items">
+                <span class="timeline-chip">生命保障系统</span>
+                <span class="timeline-chip">辐射防护</span>
+                <span class="timeline-chip">100 kWe扩容</span>
+                <span class="timeline-chip">返回能力</span>
+              </div>
+            </div>
+          </article>
+          
+          <article class="timeline-item" role="listitem">
+            <div class="timeline-dot" aria-hidden="true"></div>
+            <div class="timeline-card">
+              <span class="timeline-phase">Phase 3</span>
+              <h3 class="timeline-title">Permanent Outpost</h3>
+              <p class="timeline-title-zh">永久前哨站</p>
+              <div class="timeline-items">
+                <span class="timeline-chip">连续驻留</span>
+                <span class="timeline-chip">2 MWe规模</span>
+                <span class="timeline-chip">推进剂生产</span>
+                <span class="timeline-chip">火星本地制造</span>
+              </div>
+            </div>
+          </article>
+          
+          <article class="timeline-item" role="listitem">
+            <div class="timeline-dot" aria-hidden="true"></div>
+            <div class="timeline-card">
+              <span class="timeline-phase">Phase 4</span>
+              <h3 class="timeline-title">Settlement</h3>
+              <p class="timeline-title-zh">定居点</p>
+              <div class="timeline-items">
+                <span class="timeline-chip">百人规模</span>
+                <span class="timeline-chip">农业闭环</span>
+                <span class="timeline-chip">经济自持</span>
+                <span class="timeline-chip">文化独立</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    
+    <hr class="section-divider" aria-hidden="true" />
+    
+    <!-- Updates Section -->
+    <section id="updates" aria-labelledby="updates-title">
+      <div class="section-container">
+        <header class="section-header">
+          <span class="section-tag">Latest Updates</span>
+          <h2 id="updates-title" class="section-title">
+            <span class="en">Project Updates</span>
+            <span class="zh">项目动态</span>
+          </h2>
+        </header>
+        
+        <div class="updates-grid">
+          <div class="update-feed" role="feed" aria-labelledby="updates-title">
+            <article class="update-card" role="article">
+              <div class="update-date">
+                <span class="update-month">MAY</span>
+                <span class="update-day">24</span>
+                <span class="update-year">2026</span>
+              </div>
+              <div class="update-content">
+                <span class="update-category cat-energy">ENERGY</span>
+                <h3 class="update-title-en">FSP Engineering Design Complete</h3>
+                <p class="update-title-zh">裂变地表电源工程设计完成</p>
+                <p class="update-summary">完成40kWe级核裂变地表电源的详细工程设计，包括热管理、屏蔽布局和冗余架构。</p>
+              </div>
+            </article>
+            
+            <article class="update-card" role="article">
+              <div class="update-date">
+                <span class="update-month">MAY</span>
+                <span class="update-day">20</span>
+                <span class="update-year">2026</span>
+              </div>
+              <div class="update-content">
+                <span class="update-category cat-network">NETWORK</span>
+                <h3 class="update-title-en">MarsLink Constellation Simulation</h3>
+                <p class="update-title-zh">MarsLink星座仿真验证</p>
+                <p class="update-summary">三层轨道星座的半物理仿真平台验证完成，实现全双工自主建链协议的端到端测试。</p>
+              </div>
+            </article>
+            
+            <article class="update-card" role="article">
+              <div class="update-date">
+                <span class="update-month">MAY</span>
+                <span class="update-day">15</span>
+                <span class="update-year">2026</span>
+              </div>
+              <div class="update-content">
+                <span class="update-category cat-structure">STRUCTURE</span>
+                <h3 class="update-title-en">StarCrete Strength Test</h3>
+                <p class="update-title-zh">StarCrete强度测试</p>
+                <p class="update-summary">火星模拟环境下的StarCrete材料测试显示抗拉强度达到72 MPa，是标准混凝土的2倍。</p>
+              </div>
+            </article>
+          </div>
+          
+          <aside class="sidebar-panel" aria-label="系统状态">
+            <div class="sidebar-header">
+              <h3 class="sidebar-header-title">SYSTEM STATUS</h3>
+              <p class="sidebar-header-zh">系统状态</p>
+            </div>
+            <div class="sidebar-body">
+              <div class="sys-status-list" role="list">
+                <div class="sys-status-item" role="listitem">
+                  <div>
+                    <span class="sys-status-name">Energy Module</span>
+                    <span class="sys-status-zh">能源模块</span>
+                  </div>
+                  <span class="status-badge status-online">
+                    <span class="dot" aria-hidden="true"></span> ONLINE
+                  </span>
+                </div>
+                <div class="sys-status-item" role="listitem">
+                  <div>
+                    <span class="sys-status-name">Communication</span>
+                    <span class="sys-status-zh">通信模块</span>
+                  </div>
+                  <span class="status-badge status-testing">
+                    <span class="dot" aria-hidden="true"></span> TESTING
+                  </span>
+                </div>
+                <div class="sys-status-item" role="listitem">
+                  <div>
+                    <span class="sys-status-name">Materials</span>
+                    <span class="sys-status-zh">材料模块</span>
+                  </div>
+                  <span class="status-badge status-dev">
+                    <span class="dot" aria-hidden="true"></span> DEV
+                  </span>
+                </div>
+                <div class="sys-status-item" role="listitem">
+                  <div>
+                    <span class="sys-status-name">Network</span>
+                    <span class="sys-status-zh">网络模块</span>
+                  </div>
+                  <span class="status-badge status-online">
+                    <span class="dot" aria-hidden="true"></span> ONLINE
+                  </span>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+    
+    <hr class="section-divider" aria-hidden="true" />
+    
+    <!-- Contact Section -->
+    <section id="contact" aria-labelledby="contact-title">
+      <div class="section-container">
+        <header class="section-header">
+          <span class="section-tag">Get In Touch</span>
+          <h2 id="contact-title" class="section-title">
+            <span class="en">Contact & Collaboration</span>
+            <span class="zh">联系与协作</span>
+          </h2>
+        </header>
+        
+        <div class="contact-grid">
+          <div class="contact-info">
+            <h3>Mars Base Alpha Project</h3>
+            <p class="zh">火星基地阿尔法项目</p>
+            <p>
+              我们欢迎对火星基地工程感兴趣的科研机构、工程团队和个人研究者加入协作。
+              这是一个开放的开源项目，所有技术文档和设计资料均在GitHub公开。
+            </p>
+            <div class="contact-links">
+              <a href="https://github.com/eugenewang126-afk/eugene-WANG" class="contact-link-item">
+                <span class="contact-link-icon" aria-hidden="true">📂</span>
+                <span>GitHub Repository</span>
+              </a>
+              <a href="mailto:contact@marsbasealpha.org" class="contact-link-item">
+                <span class="contact-link-icon" aria-hidden="true">📧</span>
+                <span>contact@marsbasealpha.org</span>
+              </a>
+              <a href="#" class="contact-link-item">
+                <span class="contact-link-icon" aria-hidden="true">📄</span>
+                <span>Technical Documentation</span>
+              </a>
+            </div>
+          </div>
+          
+          <form class="contact-form" action="#" method="post" aria-label="联系表单">
+            <h4 class="form-title">Send Message</h4>
+            <p class="form-title-zh">发送消息</p>
+            
+            <div class="form-group">
+              <label for="name" class="form-label">Name 姓名</label>
+              <input type="text" id="name" name="name" class="form-input" required aria-required="true" />
+            </div>
+            
+            <div class="form-group">
+              <label for="email" class="form-label">Email 邮箱</label>
+              <input type="email" id="email" name="email" class="form-input" required aria-required="true" />
+            </div>
+            
+            <div class="form-group">
+              <label for="subject" class="form-label">Subject 主题</label>
+              <select id="subject" name="subject" class="form-select">
+                <option value="collaboration">Collaboration 协作</option>
+                <option value="technical">Technical Question 技术问题</option>
+                <option value="feedback">Feedback 反馈</option>
+                <option value="other">Other 其他</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="message" class="form-label">Message 消息</label>
+              <textarea id="message" name="message" class="form-textarea" rows="4" required aria-required="true"></textarea>
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%;">
+              <span aria-hidden="true">📤</span> Send Message 发送消息
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+    
+  </main>
+  
+  <!-- Footer -->
+  <footer role="contentinfo" style="background: var(--space-deep); border-top: 1px solid var(--space-border); padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+    <p>
+      <strong>Mars Base Alpha</strong> · 火星基地阿尔法
+      <br />
+      An Open-Source Engineering Design Platform for Mars Permanent Base
+    </p>
+    <p style="margin-top: 0.5rem;">
+      <a href="https://github.com/eugenewang126-afk/eugene-WANG" style="color: var(--mars-amber);">GitHub</a>
+      ·
+      <a href="#" style="color: var(--mars-amber);">Documentation</a>
+      ·
+      <a href="#" style="color: var(--mars-amber);">License: MIT</a>
+    </p>
+    <p style="margin-top: 0.5rem; font-size: 0.75rem;">
+      © 2026 Mars Base Alpha Project. All rights reserved.
+    </p>
+  </footer>
+  
+  <!-- JavaScript -->
+  <script src="js/main.js"></script>
+</body>
+</html>
