@@ -36,6 +36,7 @@
     // -- Overview --
     '#overview .section-desc': 'Based on Mars environmental parameters and first principles, constructing a modular, scalable Mars base design framework. Each module is independently optimized for rapid integration and scale expansion.',
     '#overview .module-card:nth-child(1) .module-desc': 'Three-track parallel power architecture: Fission Surface Power (base load) + In-situ gas thermoelectric conversion + Solar PV (flexible supplement), ensuring 40 kWe baseline power around the clock.',
+    '#overview .module-card:nth-child(1) .module-arrow': 'View Detailed Design <span aria-hidden="true">→</span>',
     '#overview .module-card:nth-child(2) .module-desc': 'MarsLink constellation design based on Starlink architecture: Three-layer orbital architecture (LMO/MO/ArSO) + Laser inter-satellite links + Full-duplex autonomous link establishment protocol.',
     '#overview .module-card:nth-child(3) .module-desc': 'Five-track parallel material roadmap: Regolith fiber reinforcement + Sulfur concrete + StarCrete + Geopolymer + Cold sintered ceramics, maximizing in-situ resource utilization.',
     '#overview .module-card:nth-child(4) .module-desc': 'Four-layer autonomous pyramid architecture: Execution → Coordination → Planning → Decision, achieving fully autonomous operation under 3-22 minute communication delay.',
@@ -48,6 +49,7 @@
     '#panel-energy .sub-card:nth-child(1) .sub-card-list': '<li>Thermal Power: 400 kWth</li><li>Electric Power: 40 kWe</li><li>Operating Temp: 800–1000 K</li><li>Design Life: 10+ years</li>',
     '#panel-energy .sub-card:nth-child(2) .sub-card-list': '<li>Medium: Martian CO₂ (95%+)</li><li>Temperature Drive: Day-night differential</li><li>ISRU Advantage: Zero transport cost</li><li>Power Range: 10–100 kWe</li>',
     '#panel-energy .sub-card:nth-child(3) .sub-card-list': '<li>Irradiance: ~590 W/m²</li><li>Dust Storm Attenuation: Up to 99%</li><li>Power Range: 5–20 kWe</li><li>Function: Flexible supplement + Peak shaving</li>',
+    '#panel-energy .btn-primary': '<span aria-hidden="true">⚡</span> View Full Detailed Design <span aria-hidden="true">→</span>',
 
     // -- Systems: Communication Panel --
     '#panel-communication .sys-panel-desc': 'MarsLink constellation design based on Starlink technology stack, redefining the engineering paradigm of Mars space networks. Mass deployment amortizes costs, laser inter-satellite links eliminate ground station dependency, SDN enables dynamic self-healing.',
