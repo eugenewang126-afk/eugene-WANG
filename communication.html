@@ -299,6 +299,14 @@
     .link-budget-table .lb-param{color:var(--text-primary);font-weight:600;}
     .link-budget-table .lb-value{font-family:var(--font-en);color:var(--comm-cyan);font-weight:700;}
     .link-budget-table .lb-note{font-size:0.7rem;color:var(--text-muted);}
+
+    /* Bilingual visibility */
+    .en{display:none;}
+    .zh{display:inherit;}
+    body.lang-en .en{display:inherit;}
+    body.lang-en .zh{display:none;}
+    body.lang-en .hero-title-en{display:block;}
+    body.lang-en .hero-title-zh{display:none;}
   </style>
 </head>
 <body>
@@ -320,6 +328,10 @@
         <a href="index.html#updates" class="nav-link" role="menuitem">动态</a>
       </div>
       <div class="nav-right">
+        <div class="lang-toggle" role="group" aria-label="语言切换">
+          <button class="lang-btn active" data-lang="zh" aria-pressed="true">中文</button>
+          <button class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+        </div>
         <a href="index.html" class="btn-back">← 返回首页</a>
       </div>
     </nav>
@@ -336,8 +348,8 @@
         <span>Section 3.2 · Communication System Module</span>
       </div>
       <h1 id="hero-title" class="hero-title">
-        <span class="hero-title-en">Communication System</span>
-        <span class="hero-title-zh">通信系统模块 · MarsLink星座设计</span>
+        <span class="hero-title-en en" style="display:block;">Communication System</span>
+        <span class="hero-title-zh zh">通信系统模块 · MarsLink星座设计</span>
       </h1>
       <p class="hero-subtitle">
         基于Starlink底层逻辑重新定义火星空间网络工程范式：三层轨道架构（LMO/MMO/ArSO）+ 激光星间链路消灭地面基站依赖 + SDN软件定义网络实现动态自愈 + 全双工自主建链协议保障深空通信鲁棒性。
@@ -1397,6 +1409,632 @@
         observer.observe(el);
       });
     })();
+  </script>
+
+  <!-- Bilingual Language Switching -->
+  <script>
+  (function() {
+    var EN_MAP = {
+      /* Navbar */
+      '.nav-links .nav-link:nth-child(1)': 'Overview',
+      '.nav-links .nav-link:nth-child(2)': 'Energy',
+      '.nav-links .nav-link:nth-child(3)': 'Communication',
+      '.nav-links .nav-link:nth-child(4)': 'Roadmap',
+      '.nav-links .nav-link:nth-child(5)': 'Updates',
+      '.btn-back': '\u2190 Back to Home',
+
+      /* Hero */
+      '#hero .hero-subtitle': 'Redesigning the Mars space network engineering paradigm based on Starlink core logic: three-layer orbit architecture (LMO/MMO/ArSO) + laser inter-satellite links eliminating ground station dependency + SDN software-defined network enabling dynamic self-healing + full-duplex autonomous link protocol ensuring deep-space communication robustness.',
+      '#hero .stat-item:nth-child(1) .stat-value': '3<span style="font-size:0.8rem;"> layers</span>',
+      '#hero .stat-item:nth-child(1) .stat-label': 'Orbit Layers',
+      '#hero .stat-item:nth-child(2) .stat-value': '24-60<span style="font-size:0.8rem;"> sats</span>',
+      '#hero .stat-item:nth-child(2) .stat-label': 'LMO Satellites',
+      '#hero .stat-item:nth-child(3) .stat-label': 'ArSO Altitude',
+      '#hero .stat-item:nth-child(4) .stat-label': 'ISL Capacity',
+      '#hero .stat-item:nth-child(5) .stat-label': 'Earth-Mars Delay',
+
+      /* Intro */
+      '#intro-title span:first-child': 'Starlink Core Technology Paradigm Deconstruction',
+      '#intro-title span:last-child': 'Engineering Paradigm Migration from Earth to Mars',
+      '#intro .intro-text p:nth-child(2)': 'Starlink\'s technological revolution lies not in "building many satellites," but in its <strong class="highlight">redefinition of the space network engineering paradigm</strong> \u2014 using massive deployment to amortize costs, laser inter-satellite links to eliminate ground station dependency, fully custom ASIC chips pushing phased arrays to their limits, and SDN software-defined networks enabling dynamic self-healing.',
+      '#intro .intro-text p:nth-child(3)': 'Each of these six core technology paradigms can be migrated to the Mars communication system within the bounds of physical laws. However, the migration approach must be <strong class="highlight">redetermined by Mars\'s physical constraint equations</strong> \u2014 different gravity, different orbital parameters, different radiation environment, different communication delay boundaries.',
+      '#intro .intro-text p:nth-child(4)': 'Core design philosophy: learn from Starlink, not by copying its form \u2014 but by deeply transplanting its <strong class="highlight">three foundational engineering philosophies: "ISL eliminates ground station dependency, phased array electronic beams eliminate mechanical motion, SDN dynamic routing eliminates static configuration"</strong>.',
+      '.constraint-box h3': '\u25C8 Mars Communication Physical Constraints',
+      '.constraint-list li:nth-child(1)': '<strong>Orbital Mechanics:</strong> Mars mass is 10.7% of Earth, ArSO altitude 17,032 km',
+      '.constraint-list li:nth-child(2)': '<strong>Communication Delay:</strong> 3-22 minutes (speed of light limit), Earth cannot control in real-time',
+      '.constraint-list li:nth-child(3)': '<strong>Solar Conjunction:</strong> ~14 days of complete communication blackout, autonomous operation required',
+      '.constraint-list li:nth-child(4)': '<strong>Radiation Environment:</strong> No magnetic field shielding, stronger GCR radiation',
+      '.constraint-list li:nth-child(5)': '<strong>Atmospheric Attenuation:</strong> 610 Pa atmosphere, Ka-band attenuation <0.1 dB',
+      '.constraint-list li:nth-child(6)': '<strong>Deployment Windows:</strong> ~26 months per opportunity, limited payload per launch',
+
+      /* Paradigms section header desc */
+      '#paradigms .section-header p': 'Before migrating Starlink technology to Mars, its underlying technical logic must be thoroughly deconstructed, rather than merely copying its surface form.',
+
+      /* Paradigms table headers */
+      '#paradigms .data-table thead tr th:nth-child(1)': 'Paradigm',
+      '#paradigms .data-table thead tr th:nth-child(2)': 'Earth Starlink',
+      '#paradigms .data-table thead tr th:nth-child(3)': 'Mars Adaptability',
+      '#paradigms .data-table thead tr th:nth-child(4)': 'Key Engineering Points',
+
+      /* Paradigms table body - Row 1: 大规模卫星星座 */
+      '#paradigms .data-table tbody tr:nth-child(1) td:nth-child(1)': 'Large-scale Satellite Constellation',
+      '#paradigms .data-table tbody tr:nth-child(1) td:nth-child(2)': '4,000+ LEO Satellites',
+      '#paradigms .data-table tbody tr:nth-child(1) td:nth-child(3)': '<span style="color:#22c55e;">\u2713 Fully Feasible</span>',
+      '#paradigms .data-table tbody tr:nth-child(1) td:nth-child(4)': '24-60 LMO satellites sufficient for coverage',
+
+      /* Row 2: 激光星间链路 */
+      '#paradigms .data-table tbody tr:nth-child(2) td:nth-child(1)': 'Laser Inter-Satellite Links',
+      '#paradigms .data-table tbody tr:nth-child(2) td:nth-child(2)': '4-direction 100 Gbps ISL',
+      '#paradigms .data-table tbody tr:nth-child(2) td:nth-child(3)': '<span style="color:#22c55e;">\u2713 Superior Environment</span>',
+      '#paradigms .data-table tbody tr:nth-child(2) td:nth-child(4)': 'No atmospheric turbulence interference on Mars',
+
+      /* Row 3: 相控阵用户终端 */
+      '#paradigms .data-table tbody tr:nth-child(3) td:nth-child(1)': 'Phased Array User Terminal',
+      '#paradigms .data-table tbody tr:nth-child(3) td:nth-child(2)': '1,500-element Dishy',
+      '#paradigms .data-table tbody tr:nth-child(3) td:nth-child(3)': '<span style="color:#eab308;">\u25B3 Requires Radiation Hardening</span>',
+      '#paradigms .data-table tbody tr:nth-child(3) td:nth-child(4)': 'ASIC requires respin, TID>300 krad',
+
+      /* Row 4: 全定制ASIC芯片 */
+      '#paradigms .data-table tbody tr:nth-child(4) td:nth-child(1)': 'Full-custom ASIC Chip',
+      '#paradigms .data-table tbody tr:nth-child(4) td:nth-child(2)': 'Self-developed 28nm RF Chip',
+      '#paradigms .data-table tbody tr:nth-child(4) td:nth-child(3)': '<span style="color:#eab308;">\u25B3 Requires Radiation Hardening</span>',
+      '#paradigms .data-table tbody tr:nth-child(4) td:nth-child(4)': 'SOI process + TMR design',
+
+      /* Row 5: SDN软件定义网络 */
+      '#paradigms .data-table tbody tr:nth-child(5) td:nth-child(1)': 'SDN Software-Defined Network',
+      '#paradigms .data-table tbody tr:nth-child(5) td:nth-child(2)': 'Dynamic Topology Routing',
+      '#paradigms .data-table tbody tr:nth-child(5) td:nth-child(3)': '<span style="color:#22c55e;">\u2713 Fully Feasible</span>',
+      '#paradigms .data-table tbody tr:nth-child(5) td:nth-child(4)': 'Mars local fully autonomous',
+
+      /* Row 6: 垂直整合量产 */
+      '#paradigms .data-table tbody tr:nth-child(6) td:nth-child(1)': 'Vertical Integration & Mass Production',
+      '#paradigms .data-table tbody tr:nth-child(6) td:nth-child(2)': 'End-to-end Cost Control',
+      '#paradigms .data-table tbody tr:nth-child(6) td:nth-child(3)': '<span style="color:#3b82f6;">\u25CB Scale Reduced</span>',
+      '#paradigms .data-table tbody tr:nth-child(6) td:nth-child(4)': 'Single Starship carries 20-50 satellites',
+
+      /* Orbit Shells section header desc */
+      '#orbit-shells .section-header p': 'Drawing on Starlink\'s multi-shell orbit design concept and combining Mars physical parameters, a three-layer orbit constellation is designed for global coverage and deep-space communication relay.',
+
+      /* Architecture diagram SVG labels */
+      '#orbit-shells svg text:nth-of-type(4)': 'Earth-Mars Laser Relay + Global Broadcast',
+      '#orbit-shells svg text:nth-of-type(6)': 'ISL Relay Backbone + Polar Coverage',
+      '#orbit-shells svg text:nth-of-type(8)': 'High-speed Broadband Access \u00B7 24-60 sats',
+
+      /* Shell-1 LMO card */
+      '.shell-1 .zh-sub': 'Low Mars Orbit Layer \u00B7 High-speed Broadband Access',
+      '.shell-1 .shell-body p': 'Mars version simulating Starlink LEO shell, providing high-speed broadband access to the Martian surface. Orbit altitude 350-500 km, single-satellite coverage radius ~1,120 km, 24 satellites achieve \u00B160\u00B0 equatorial coverage of 85%.',
+      '.shell-1 .shell-spec:nth-child(1)': 'Orbit Altitude: 350-500 km',
+      '.shell-1 .shell-spec:nth-child(2)': 'Orbital Period: 112-128 min',
+      '.shell-1 .shell-metric:nth-child(1) .shell-metric-label': 'Satellites',
+      '.shell-1 .shell-metric:nth-child(2) .shell-metric-label': 'Coverage Radius km',
+      '.shell-1 .shell-metric:nth-child(4) .shell-metric-label': 'Beams',
+
+      /* Shell-2 MMO card */
+      '.shell-2 .zh-sub': 'Medium Orbit Layer \u00B7 ISL Relay Backbone + Polar Coverage',
+      '.shell-2 .shell-body p': 'Serving as the ISL relay backbone intermediate layer, supplementing polar coverage that LMO cannot effectively cover, while providing a routing springboard between ArSO and LMO. 6-12 satellites achieve polar coverage supplementation.',
+      '.shell-2 .shell-spec:nth-child(1)': 'Orbit Altitude: 5,000-8,000 km',
+      '.shell-2 .shell-spec:nth-child(2)': 'Orbital Period: ~4-6 h',
+      '.shell-2 .shell-spec:nth-child(3)': 'DTN Custody Node',
+      '.shell-2 .shell-spec:nth-child(4)': 'Polar Coverage Supplement',
+      '.shell-2 .shell-metric:nth-child(1) .shell-metric-label': 'Satellites',
+      '.shell-2 .shell-metric:nth-child(2) .shell-metric-label': 'Coverage Radius km',
+      '.shell-2 .shell-metric:nth-child(4) .shell-metric-label': 'Beams',
+
+      /* Shell-3 ArSO card */
+      '.shell-3 .zh-sub': 'AreoStationary Orbit Layer \u00B7 Earth-Mars Communication Relay',
+      '.shell-3 .shell-body p': 'AreoStationary orbit (equivalent to Earth GEO), altitude 17,032 km. Only 3 satellites evenly distributed achieve global Mars coverage. Core functions: Earth-Mars laser communication relay (carrying deep-space optical communication terminal) + Mars global broadcast.',
+      '.shell-3 .shell-spec:nth-child(1)': 'Orbit Altitude: 17,032 km',
+      '.shell-3 .shell-spec:nth-child(2)': 'Orbital Period: 24.6 h',
+      '.shell-3 .shell-spec:nth-child(3)': 'Earth-direction Laser Terminal',
+      '.shell-3 .shell-spec:nth-child(4)': 'Ka-band Downlink',
+      '.shell-3 .shell-metric:nth-child(1) .shell-metric-label': 'Satellites',
+      '.shell-3 .shell-metric:nth-child(2) .shell-metric-label': 'Coverage',
+      '.shell-3 .shell-metric:nth-child(3) .shell-metric-label': 'Gbps Peak',
+      '.shell-3 .shell-metric:nth-child(4) .shell-metric-label': 'Mbps Long-range',
+
+      /* Coverage calculation */
+      '#orbit-shells .fade-section h4': 'Orbit Coverage Engineering Calculation',
+      '#orbit-shells .fade-section p:nth-child(2)': 'Single LMO satellite (altitude h = 400 km) ground coverage radius:',
+      '#orbit-shells .fade-section p:nth-child(4)': '24 LMO satellites in Walker constellation (Walker: 24/3/1) uniformly distributed, 8 satellites per orbital plane in three planes, equatorial \u00B160\u00B0 coverage up to approximately <strong style="color:var(--comm-cyan);">85%</strong>, polar coverage supplemented by Shell-2 MMO.',
+
+      /* ISL section header desc */
+      '#isl .section-header p': 'ISL eliminates ground station dependency \u2014 this is the core reason Starlink technology\'s value is exponentially amplified on Mars.',
+
+      /* ISL text */
+      '#isl .isl-text h4': 'Physical Advantages of Mars ISL: A More Ideal Laser Communication Environment Than Earth',
+      '#isl .isl-text p:nth-child(2)': 'This is the <strong class="highlight">most important finding</strong> from transplanting Starlink ISL technology to Mars \u2014 the Mars laser inter-satellite link working environment is <strong style="color:var(--comm-cyan);">superior to Earth</strong>:',
+      '#isl .isl-text p:nth-child(3)': 'Mars atmospheric density is only 1.6% of Earth\'s, turbulence is extremely weak, laser spot jitter is nearly negligible; Mars has no water clouds (only occasional CO\u2082 ice crystal clouds), laser links are virtually unaffected by weather; Mars has no strong ionosphere, RF link phase is more stable; Mars atmospheric Ka-band attenuation <0.1 dB, propagation conditions are excellent.',
+      '#isl .isl-text p:nth-child(4)': '<strong style="color:var(--comm-cyan);">Core Conclusion:</strong> Starlink ISL\'s greatest enemies on Earth (atmospheric turbulence, cloud cover) are virtually nonexistent on Mars. Mars ISL can achieve equal or higher data rates at longer distances and lower power consumption.',
+
+      /* ISL advantage table */
+      '#isl .advantage-table thead tr th:nth-child(1)': 'Earth Obstacle',
+      '#isl .advantage-table thead tr th:nth-child(2)': 'Mars Condition',
+      '#isl .advantage-table thead tr th:nth-child(3)': 'Engineering Conclusion',
+      '#isl .advantage-table tbody tr:nth-child(1) td:nth-child(1)': 'Atmospheric Turbulence (Ground\u2194LEO)',
+      '#isl .advantage-table tbody tr:nth-child(1) td:nth-child(2)': 'Atmospheric density 1.6%, extremely weak turbulence',
+      '#isl .advantage-table tbody tr:nth-child(2) td:nth-child(1)': 'Cloud Obscuration',
+      '#isl .advantage-table tbody tr:nth-child(2) td:nth-child(2)': 'No water clouds (only CO\u2082 ice crystals)',
+      '#isl .advantage-table tbody tr:nth-child(3) td:nth-child(1)': 'Ionospheric Phase Jitter',
+      '#isl .advantage-table tbody tr:nth-child(3) td:nth-child(2)': 'Mars has no strong ionosphere',
+      '#isl .advantage-table tbody tr:nth-child(4) td:nth-child(1)': 'Geomagnetic Interference',
+      '#isl .advantage-table tbody tr:nth-child(4) td:nth-child(2)': 'Extremely weak Martian magnetic field',
+      '#isl .advantage-table tbody tr:nth-child(5) td:nth-child(1)': 'Ka-band Atmospheric Attenuation',
+      '#isl .advantage-table tbody tr:nth-child(5) td:nth-child(2)': 'Attenuation <0.1 dB',
+
+      /* ISL Link Budget */
+      '.link-budget-wrap h4': 'MarsLink ISL Link Budget Engineering Calculation',
+
+      /* ISL link budget detailed text */
+      '.link-budget-wrap p:nth-of-type(1)': 'For LMO orbit (400 km altitude) co-orbital plane adjacent satellite ISL (spacing ~2,200 km):',
+      '.link-budget-wrap p:nth-of-type(2)': 'Laser communication (\u03BB = 1,550 nm, d = 2,200 km):',
+      '.link-budget-wrap p:nth-of-type(3)': 'For 100 Gbps coherent modulation (minimum received power ~-30 dBm = 1 \u03BCW), link margin is approximately <strong style="color:var(--comm-cyan);">11 dB</strong>, fully satisfying 99% availability requirement.',
+
+      /* ISL link budget table */
+      '.link-budget-wrap .data-table thead tr th:nth-child(1)': 'Parameter',
+      '.link-budget-wrap .data-table thead tr th:nth-child(2)': 'Value',
+      '.link-budget-wrap .data-table thead tr th:nth-child(3)': 'Note',
+      '.link-budget-wrap .data-table tbody tr:nth-child(1) td:nth-child(1)': 'Wavelength',
+      '.link-budget-wrap .data-table tbody tr:nth-child(1) td:nth-child(3)': 'C-band Standard',
+      '.link-budget-wrap .data-table tbody tr:nth-child(2) td:nth-child(1)': 'Telescope Aperture',
+      '.link-budget-wrap .data-table tbody tr:nth-child(2) td:nth-child(3)': 'Compact Design',
+      '.link-budget-wrap .data-table tbody tr:nth-child(3) td:nth-child(1)': 'Transmit Power',
+      '.link-budget-wrap .data-table tbody tr:nth-child(3) td:nth-child(3)': 'Peak Power',
+      '.link-budget-wrap .data-table tbody tr:nth-child(4) td:nth-child(1)': 'Link Distance',
+      '.link-budget-wrap .data-table tbody tr:nth-child(4) td:nth-child(3)': 'Co-orbital Adjacent Sat',
+      '.link-budget-wrap .data-table tbody tr:nth-child(5) td:nth-child(1)': 'Received Power',
+      '.link-budget-wrap .data-table tbody tr:nth-child(6) td:nth-child(1)': 'Minimum Demodulable',
+      '.link-budget-wrap .data-table tbody tr:nth-child(7) td:nth-child(1)': 'Link Margin',
+      '.link-budget-wrap .data-table tbody tr:nth-child(7) td:nth-child(3)': 'Satisfies 99% Availability',
+
+      /* Earth-Mars link section - heading and intro paragraph handled via data-i18n-orig */
+
+      /* SDN section header desc */
+      '#sdn .section-header p': 'Layered fusion of Mars locally-autonomous SDN and DTN interplanetary protocol \u2014 solving the fundamental challenge that Earth cannot participate in Mars real-time routing decisions.',
+
+      /* QoS Table */
+      '#sdn h4': 'QoS Traffic Layered Scheduling Design',
+      '#sdn .qos-table thead tr th:nth-child(1)': 'Priority',
+      '#sdn .qos-table thead tr th:nth-child(2)': 'Service Type',
+      '#sdn .qos-table thead tr th:nth-child(3)': 'Bandwidth Guarantee',
+      '#sdn .qos-table thead tr th:nth-child(4)': 'Delay Requirement',
+      '#sdn .qos-table thead tr th:nth-child(5)': 'Loss Tolerance',
+
+      /* QoS body */
+      '#sdn .qos-table tbody tr:nth-child(1) td:nth-child(2)': 'Life Support Telemetry',
+      '#sdn .qos-table tbody tr:nth-child(1) td:nth-child(5)': 'Zero Tolerance',
+      '#sdn .qos-table tbody tr:nth-child(2) td:nth-child(2)': 'Command & Control Link',
+      '#sdn .qos-table tbody tr:nth-child(3) td:nth-child(2)': 'Science Data Downlink',
+      '#sdn .qos-table tbody tr:nth-child(3) td:nth-child(4)': 'Minute-level',
+      '#sdn .qos-table tbody tr:nth-child(3) td:nth-child(5)': 'Retransmittable',
+      '#sdn .qos-table tbody tr:nth-child(4) td:nth-child(2)': 'Video Communication / Media',
+      '#sdn .qos-table tbody tr:nth-child(4) td:nth-child(5)': 'Acceptable',
+
+      /* Protocol section header desc */
+      '#protocol .section-header p': 'Under the quadruple constraints of 3-22 minute communication delay, no GPS infrastructure, continuous GCR radiation bombardment, and extremely limited energy, achieving fully autonomous sensing, decision-making, and execution.',
+
+      /* Protocol cards */
+      '#protocol .protocol-card:nth-child(1) h4': 'Core Protocol Design Principles',
+      '#protocol .protocol-card:nth-child(1) p': 'Drawing on Starlink\'s core concept of ephemeris-based pre-computed forwarding tables, the Mars communication protocol must complete local link establishment decisions <strong style="color:var(--comm-cyan);">before any Earth intervention</strong>:',
+      '#protocol .protocol-card:nth-child(1) .protocol-steps li:nth-child(1) .step-text': '<strong>Orbit Prediction First:</strong> All communication nodes pre-compute all possible contact windows based on precision orbit ephemeris',
+      '#protocol .protocol-card:nth-child(1) .protocol-steps li:nth-child(2) .step-text': '<strong>Handshake-free Linking:</strong> Sender unilaterally initiates communication, receiver passively monitors and decodes (suitable for deep-space long delays)',
+      '#protocol .protocol-card:nth-child(1) .protocol-steps li:nth-child(3) .step-text': '<strong>DTN Bundle Encapsulation:</strong> Data packaged as Bundles, supporting intermediate node custody forwarding',
+      '#protocol .protocol-card:nth-child(1) .protocol-steps li:nth-child(4) .step-text': '<strong>Fault Self-healing:</strong> Automatic backup path switching on link interruption (pre-computed)',
+
+      '#protocol .protocol-card:nth-child(2) h4': 'Full-Duplex Link Handshake Procedure (CN114337791B)',
+      '#protocol .protocol-card:nth-child(2) p': 'Applicable to communication link establishment between fixed/mobile nodes on the Martian surface:',
+      '#protocol .protocol-card:nth-child(2) .protocol-steps li:nth-child(1) .step-text': '<strong>Channel Scanning:</strong> Receiver continuously monitors UHF/Ka band preamble codes',
+      '#protocol .protocol-card:nth-child(2) .protocol-steps li:nth-child(2) .step-text': '<strong>Carrier Detection:</strong> Upon detecting valid signal, starts AGC and bit synchronization',
+      '#protocol .protocol-card:nth-child(2) .protocol-steps li:nth-child(3) .step-text': '<strong>Identity Verification:</strong> Decodes node ID in preamble, verifies against whitelist',
+      '#protocol .protocol-card:nth-child(2) .protocol-steps li:nth-child(4) .step-text': '<strong>Bidirectional Link Establishment:</strong> Sends confirmation frame, establishes full-duplex communication session',
+      '#protocol .protocol-card:nth-child(2) .protocol-steps li:nth-child(5) .step-text': '<strong>Link Maintenance:</strong> Periodically sends keepalive frames, auto-release on timeout',
+
+      /* Terminal comparison - handled via imperative code in setLanguage */
+
+      /* Sun Conjunction section header desc */
+      '#sun-conjunction .section-header p': 'Occurs approximately every 26 months, lasting about 14 days, when communication between Earth and Mars is completely obscured by solar radio interference.',
+
+      /* Timeline items */
+      '.timeline-item:nth-child(1) .timeline-tag': 'Preparation Phase \u00B7 T-30 days',
+      '.timeline-item:nth-child(1) .timeline-zh': '30-day Pre-conjunction Preparation',
+      '.timeline-item:nth-child(1) .timeline-content li:nth-child(1)': 'SDN controller generates complete conjunction period mission plan',
+      '.timeline-item:nth-child(1) .timeline-content li:nth-child(2)': 'Pre-upload all automated task instructions (Bundles pre-stored on Mars nodes)',
+      '.timeline-item:nth-child(1) .timeline-content li:nth-child(3)': 'Science data cached locally to 1TB+ storage',
+      '.timeline-item:nth-child(1) .timeline-content li:nth-child(4)': 'Switch to "Mars Autonomous Mode" (MarsLink operates independently)',
+
+      '.timeline-item:nth-child(2) .timeline-tag': 'Blackout Phase \u00B7 ~14 days',
+      '.timeline-item:nth-child(2) .timeline-zh': 'Complete Blackout During Conjunction',
+      '.timeline-item:nth-child(2) .timeline-content li:nth-child(1)': '<strong style="color:var(--comm-cyan);">Mars Internal Communication:</strong> MarsLink constellation fully autonomous, LMO\u2194MMO\u2194ArSO three-layer ISL backbone operating normally',
+      '.timeline-item:nth-child(2) .timeline-content li:nth-child(2)': '<strong style="color:var(--comm-cyan);">Earth-Mars Link:</strong> Physically unavailable (radio occultation), communication impossible',
+      '.timeline-item:nth-child(2) .timeline-content li:nth-child(3)': '<strong style="color:var(--comm-cyan);">Base Operations:</strong> L0+L1 autonomous operation, SDN local control',
+      '.timeline-item:nth-child(2) .timeline-content li:nth-child(4)': '<strong style="color:#eab308;">Emergency:</strong> Attempt bypass routing via ArSO satellite relay (limited effectiveness)',
+
+      '.timeline-item:nth-child(3) .timeline-tag': 'Recovery Phase \u00B7 T+0',
+      '.timeline-item:nth-child(3) .timeline-zh': 'Post-conjunction Recovery',
+      '.timeline-item:nth-child(3) .timeline-content li:nth-child(1)': 'Laser communication link re-establishment (PAT alignment completed in ~30 min)',
+      '.timeline-item:nth-child(3) .timeline-content li:nth-child(2)': 'DTN Bundle batch downlink (backlogged science data priority-sorted)',
+      '.timeline-item:nth-child(3) .timeline-content li:nth-child(3)': 'Earth updates Mars SDN global topology state',
+      '.timeline-item:nth-child(3) .timeline-content li:nth-child(4)': 'System restores bidirectional real-time control mode',
+
+      /* Deployment section header desc */
+      '#deployment .section-header p': 'Each Earth-Mars transfer window is the only deployment opportunity; sufficient redundant backup satellites (+20%) must be carried in a single launch',
+
+      /* Phase cards */
+      '.phase-p0 .phase-zh': 'Unmanned Pioneer Phase',
+      '.phase-p0 .phase-chip:nth-child(1)': '3 ArSO',
+      '.phase-p0 .phase-chip:nth-child(2)': '6 LMO',
+      '.phase-p0 .phase-chip:nth-child(3)': '6 MMO',
+      '.phase-p0 .phase-chip:nth-child(4)': 'Backup +5',
+      '.phase-p0 .phase-status': '\u26A0\uFE0F Planning \u00B7 Single Starship',
+
+      '.phase-p1 .phase-zh': 'Full LMO Constellation Deployment',
+      '.phase-p1 .phase-chip:nth-child(1)': '24 LMO',
+      '.phase-p1 .phase-chip:nth-child(2)': 'Complete Walker Constellation',
+      '.phase-p1 .phase-chip:nth-child(3)': 'Laser Comms Verification',
+      '.phase-p1 .phase-chip:nth-child(4)': 'Data Rate >100 Mbps',
+      '.phase-p1 .phase-status': '\u26A0\uFE0F Planning',
+
+      '.phase-p2 .phase-zh': 'Crewed Mission Support',
+      '.phase-p2 .phase-chip:nth-child(1)': '60 LMO Extended',
+      '.phase-p2 .phase-chip:nth-child(2)': 'Global Seamless Coverage',
+      '.phase-p2 .phase-chip:nth-child(3)': 'HD Video Support',
+      '.phase-p2 .phase-chip:nth-child(4)': '99.9% Availability',
+      '.phase-p2 .phase-status': '\u26A0\uFE0F Planning',
+
+      '.phase-p3 .phase-year': 'Long-term',
+      '.phase-p3 .phase-zh': 'Interplanetary Internet',
+      '.phase-p3 .phase-chip:nth-child(1)': 'IPN Node Established',
+      '.phase-p3 .phase-chip:nth-child(2)': 'Interconnected with Earth Starlink',
+      '.phase-p3 .phase-chip:nth-child(4)': 'Mars City-level Support',
+      '.phase-p3 .phase-status': '\uD83D\uDD2E Long-term Vision',
+
+      /* Starship deployment section - handled via data-i18n-orig approach */
+
+      /* Summary table headers */
+      '.summary-table thead tr th:nth-child(1)': 'Layer/Component',
+      '.summary-table thead tr th:nth-child(2)': 'Key Parameters',
+      '.summary-table thead tr th:nth-child(4)': 'Key Technology',
+      '.summary-table thead tr th:nth-child(5)': 'Main Challenge',
+
+      /* Summary table body */
+      '.summary-table tbody tr:nth-child(1) td:nth-child(1)': 'Shell-1 LMO Layer',
+      '.summary-table tbody tr:nth-child(1) td:nth-child(4)': '4\u00D7ISL Laser \u00B7 8-beam X/Ka',
+      '.summary-table tbody tr:nth-child(1) td:nth-child(5)': 'Walker Constellation Orbit Maintenance',
+      '.summary-table tbody tr:nth-child(2) td:nth-child(1)': 'Shell-2 MMO Layer',
+      '.summary-table tbody tr:nth-child(2) td:nth-child(4)': 'DTN Custody Node \u00B7 Polar Coverage',
+      '.summary-table tbody tr:nth-child(2) td:nth-child(5)': 'Relay Routing Optimization',
+      '.summary-table tbody tr:nth-child(3) td:nth-child(1)': 'Shell-3 ArSO Layer',
+      '.summary-table tbody tr:nth-child(3) td:nth-child(4)': 'Earth-Mars Laser Terminal \u00B7 Global Broadcast',
+      '.summary-table tbody tr:nth-child(3) td:nth-child(5)': 'Deep-space Pointing Accuracy <100 nrad',
+      '.summary-table tbody tr:nth-child(4) td:nth-child(1)': 'ISL Laser Link',
+      '.summary-table tbody tr:nth-child(4) td:nth-child(4)': 'Coherent Modulation \u00B7 15 cm Telescope',
+      '.summary-table tbody tr:nth-child(4) td:nth-child(5)': 'Inter-satellite Tracking Alignment',
+      '.summary-table tbody tr:nth-child(5) td:nth-child(1)': 'Earth-Mars Laser Link',
+      '.summary-table tbody tr:nth-child(5) td:nth-child(4)': 'Deep-space Optical Comm Terminal',
+      '.summary-table tbody tr:nth-child(5) td:nth-child(5)': 'Ultra-precision Pointing Aberration Compensation',
+      '.summary-table tbody tr:nth-child(6) td:nth-child(1)': 'MarsDishy Terminal',
+      '.summary-table tbody tr:nth-child(6) td:nth-child(4)': 'Radiation-hardened ASIC \u00B7 EDS Dust Removal',
+      '.summary-table tbody tr:nth-child(6) td:nth-child(5)': 'ASIC Respin Cost',
+      '.summary-table tbody tr:nth-child(7) td:nth-child(1)': 'SDN Autonomous Control',
+      '.summary-table tbody tr:nth-child(7) td:nth-child(4)': 'CGR Contact Graph Routing \u00B7 QoS Scheduling',
+      '.summary-table tbody tr:nth-child(7) td:nth-child(5)': '14-day Conjunction Period Verification',
+      '.summary-table tbody tr:nth-child(8) td:nth-child(1)': 'DTN Bundle Protocol',
+      '.summary-table tbody tr:nth-child(8) td:nth-child(4)': 'LTPCL \u00B7 BPv7',
+      '.summary-table tbody tr:nth-child(8) td:nth-child(5)': 'Integration with IP Network Protocol Stack',
+
+      /* Summary closing section */
+      '#summary .intro-text h2 span': 'Section Conclusion',
+      '#summary .intro-text p:nth-child(2)': 'The engineering core of the Mars communication system module is the transplantation and elevation of the <strong style="color:var(--comm-cyan);">three foundational engineering philosophies: "ISL eliminates ground station dependency, phased array electronic beams eliminate mechanical motion, SDN dynamic routing eliminates static configuration"</strong>. On Mars, the value of these three philosophies is exponentially amplified: ISL makes the Mars network <strong style="color:var(--comm-cyan);">completely independent of any ground infrastructure</strong>; phased array terminals (MarsDishy) enable any Mars node to be plug-and-play; SDN autonomous control plane ensures that when Earth <strong style="color:var(--comm-cyan);">cannot intervene at all</strong>, the Mars communication system can always self-heal and stay online.',
+      '#summary .intro-text p:nth-child(3)': 'Note: MarsLink constellation parameters are derived from Starlink public technical documentation and Mars orbital mechanics calculations; laser communication link budgets are based on deep-space optical communication project (DSOC, LLCD) verification data; SDN-DTN fusion architecture is based on CCSDS DTN standards and Contact Graph Routing (CGR) algorithm.',
+
+      /* Footer */
+      'footer p:first-child': '<strong>Mars Base Alpha</strong><br />\n      <span style="font-size:0.78rem;">Section 3.2 \u00B7 Communication System \u00B7 MarsLink Detailed Design</span>',
+      'footer p:nth-child(2)': '<a href="index.html">Back to Home</a> \u00B7\n      <a href="energy.html">Energy Module</a> \u00B7\n      <a href="https://github.com/eugenewang126-afk/eugene-WANG">GitHub</a> \u00B7\n      <span style="color:var(--text-muted);">Based on First Principles \u00B7 2026</span>',
+
+      /* Earth-Mars link table - handled via data-i18n-orig approach */
+
+      /* Deployment Starship section - handled via data-i18n-orig approach */
+
+      /* QoS description paragraph */
+      '#sdn .fade-section p:nth-of-type(1)': 'Starlink has implemented traffic priority scheduling based on service types; the Mars version mapping is as follows:'
+    };
+
+    function setLanguage(lang) {
+      var isEn = lang === 'en';
+
+      // Toggle body class for .en/.zh visibility
+      if (isEn) {
+        document.body.classList.add('lang-en');
+      } else {
+        document.body.classList.remove('lang-en');
+      }
+
+      // Apply EN_MAP swaps
+      var selectors = Object.keys(EN_MAP);
+      for (var i = 0; i < selectors.length; i++) {
+        var sel = selectors[i];
+        var el = document.querySelector(sel);
+        if (!el) continue;
+
+        if (isEn) {
+          // Save original text before overwriting
+          if (!el.getAttribute('data-i18n-orig')) {
+            el.setAttribute('data-i18n-orig', el.innerHTML);
+          }
+          el.innerHTML = EN_MAP[sel];
+        } else {
+          // Restore original text
+          var orig = el.getAttribute('data-i18n-orig');
+          if (orig !== null) {
+            el.innerHTML = orig;
+          }
+        }
+      }
+
+      // Update button active states
+      var btns = document.querySelectorAll('.lang-btn');
+      for (var j = 0; j < btns.length; j++) {
+        var btn = btns[j];
+        if (btn.getAttribute('data-lang') === lang) {
+          btn.classList.add('active');
+          btn.setAttribute('aria-pressed', 'true');
+        } else {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-pressed', 'false');
+        }
+      }
+
+      // Update HTML lang attribute
+      document.documentElement.lang = isEn ? 'en' : 'zh-CN';
+
+      // Handle Earth-Mars link section heading and paragraph
+      var emH4 = document.querySelector('#isl .fade-section[style]:nth-last-of-type(1) h4');
+      if (emH4) {
+        if (isEn) {
+          if (!emH4.getAttribute('data-i18n-orig')) emH4.setAttribute('data-i18n-orig', emH4.innerHTML);
+          emH4.innerHTML = '<span style="content:\'\';width:4px;height:18px;background:var(--comm-blue);border-radius:2px;"></span>\n          Earth-Mars Laser Communication Link (Shell-3 ArSO \u2192 Earth DSN)';
+        } else {
+          var emH4Orig = emH4.getAttribute('data-i18n-orig');
+          if (emH4Orig !== null) emH4.innerHTML = emH4Orig;
+        }
+      }
+      var emP = document.querySelector('#isl .fade-section[style]:nth-last-of-type(1) > p');
+      if (emP) {
+        if (isEn) {
+          if (!emP.getAttribute('data-i18n-orig')) emP.setAttribute('data-i18n-orig', emP.innerHTML);
+          emP.innerHTML = 'This is MarsLink\'s <strong class="highlight">most challenging link</strong>, with maximum distance of 400 million km. Pointing control system requires extreme precision:';
+        } else {
+          var emPOrig = emP.getAttribute('data-i18n-orig');
+          if (emPOrig !== null) emP.innerHTML = emPOrig;
+        }
+      }
+
+      // Handle Earth-Mars link table header and td-key cells
+      var emTable = document.querySelector('#isl .fade-section[style]:nth-last-of-type(1) .data-table');
+      if (emTable) {
+        var emHeaders = emTable.querySelectorAll('thead th');
+        var emHeaderEn = ['Parameter', 'Near Distance', 'Far Distance'];
+        emHeaders.forEach(function(th, idx) {
+          if (isEn) {
+            if (!th.getAttribute('data-i18n-orig')) th.setAttribute('data-i18n-orig', th.innerHTML);
+            th.innerHTML = emHeaderEn[idx] || th.innerHTML;
+          } else {
+            var orig = th.getAttribute('data-i18n-orig');
+            if (orig !== null) th.innerHTML = orig;
+          }
+        });
+        var emKeys = emTable.querySelectorAll('tbody td.td-key');
+        var emKeyEn = ['Communication Distance', 'Data Rate', 'Transmit Power', 'Telescope Aperture', 'Pointing Accuracy', 'Bit Error Rate'];
+        emKeys.forEach(function(td, idx) {
+          if (isEn) {
+            if (!td.getAttribute('data-i18n-orig')) td.setAttribute('data-i18n-orig', td.innerHTML);
+            td.innerHTML = emKeyEn[idx] || td.innerHTML;
+          } else {
+            var orig = td.getAttribute('data-i18n-orig');
+            if (orig !== null) td.innerHTML = orig;
+          }
+        });
+        // Near/far distance value translations
+        var emVals = emTable.querySelectorAll('tbody td.td-val');
+        var emValEn = ['55M km', '4B km', '>1 Gbps', '~100 Mbps', '5 W', '5 W', '30 cm', '30 cm', '<1 \u03BCrad', '<100 nrad', '<10\u207B\u2076', '<10\u207B\u2076'];
+        emVals.forEach(function(td, idx) {
+          if (isEn) {
+            if (!td.getAttribute('data-i18n-orig')) td.setAttribute('data-i18n-orig', td.innerHTML);
+            td.innerHTML = emValEn[idx] || td.innerHTML;
+          } else {
+            var orig = td.getAttribute('data-i18n-orig');
+            if (orig !== null) td.innerHTML = orig;
+          }
+        });
+      }
+
+      // Handle pointing control system text
+      var emPointP = document.querySelector('#isl .fade-section[style]:nth-last-of-type(1) div > p');
+      if (emPointP) {
+        if (isEn) {
+          if (!emPointP.getAttribute('data-i18n-orig')) emPointP.setAttribute('data-i18n-orig', emPointP.innerHTML);
+          emPointP.innerHTML = '<strong>Pointing Control System Design (Deep-space Version of Starlink Pointing Logic):</strong>';
+        } else {
+          var orig = emPointP.getAttribute('data-i18n-orig');
+          if (orig !== null) emPointP.innerHTML = orig;
+        }
+      }
+      var emLis = document.querySelectorAll('#isl .fade-section[style]:nth-last-of-type(1) ul li');
+      var liEn = [
+        '<span style="color:var(--comm-blue);font-weight:700;">\u2460</span> Coarse Pointing (CPA): 2-axis gimbal, \u00B130\u00B0 range, accuracy \u00B10.1\u00B0',
+        '<span style="color:var(--comm-blue);font-weight:700;">\u2461</span> Fine Pointing (FPA): Fast steering mirror, bandwidth >1 kHz, accuracy <100 nrad',
+        '<span style="color:var(--comm-blue);font-weight:700;">\u2462</span> Aberration Compensation: At 400M km distance, aberration angle ~10 \u03BCrad, requires advance compensation'
+      ];
+      emLis.forEach(function(li, idx) {
+        if (idx < liEn.length) {
+          if (isEn) {
+            if (!li.getAttribute('data-i18n-orig')) li.setAttribute('data-i18n-orig', li.innerHTML);
+            li.innerHTML = liEn[idx];
+          } else {
+            var orig = li.getAttribute('data-i18n-orig');
+            if (orig !== null) li.innerHTML = orig;
+          }
+        }
+      });
+
+      // Handle Deployment Starship section
+      var deploySection = document.querySelector('#deployment .fade-section[style]');
+      if (deploySection) {
+        var dH4 = deploySection.querySelector('h4');
+        if (dH4) {
+          if (isEn) {
+            if (!dH4.getAttribute('data-i18n-orig')) dH4.setAttribute('data-i18n-orig', dH4.innerHTML);
+            dH4.innerHTML = 'Single Starship Deployment Capacity Estimate';
+          } else {
+            var orig = dH4.getAttribute('data-i18n-orig');
+            if (orig !== null) dH4.innerHTML = orig;
+          }
+        }
+        var dLabels = deploySection.querySelectorAll('div[style]:not([style*="grid"]) div:last-child');
+        var dLabelEn = ['tons \u00B7 Earth-Mars Transfer Payload', 'kg \u00B7 Single MarsLink-Sat', 'sats \u00B7 Max per Launch', 'months \u00B7 Deployment Window Cycle'];
+        dLabels.forEach(function(lbl, idx) {
+          if (idx < dLabelEn.length) {
+            if (isEn) {
+              if (!lbl.getAttribute('data-i18n-orig')) lbl.setAttribute('data-i18n-orig', lbl.innerHTML);
+              lbl.innerHTML = dLabelEn[idx];
+            } else {
+              var orig = lbl.getAttribute('data-i18n-orig');
+              if (orig !== null) lbl.innerHTML = orig;
+            }
+          }
+        });
+      }
+
+      // Handle terminal comparison heading and spec keys
+      var earthH5 = document.querySelector('.terminal-card.earth h5');
+      if (earthH5) {
+        if (isEn) {
+          if (!earthH5.getAttribute('data-i18n-orig')) earthH5.setAttribute('data-i18n-orig', earthH5.innerHTML);
+          earthH5.innerHTML = '\uD83C\uDF0D Starlink Dishy (Earth Version)';
+        } else {
+          var orig = earthH5.getAttribute('data-i18n-orig');
+          if (orig !== null) earthH5.innerHTML = orig;
+        }
+      }
+      var marsH5 = document.querySelector('.terminal-card.mars h5');
+      if (marsH5) {
+        if (isEn) {
+          if (!marsH5.getAttribute('data-i18n-orig')) marsH5.setAttribute('data-i18n-orig', marsH5.innerHTML);
+          marsH5.innerHTML = '\uD83D\uDD34 MarsDishy (Mars Version)';
+        } else {
+          var orig = marsH5.getAttribute('data-i18n-orig');
+          if (orig !== null) marsH5.innerHTML = orig;
+        }
+      }
+      // Handle SVG text elements (architecture diagram + SDN diagram)
+      var svgTextMap = {
+        // Orbit architecture SVG
+        '#orbit-shells svg text': {
+          '地火激光中继 + 全球广播': 'Earth-Mars Laser Relay + Global Broadcast',
+          'ISL中继骨干 + 极区覆盖': 'ISL Relay Backbone + Polar Coverage',
+          '高速宽带接入 · 24-60颗': 'High-speed Broadband Access · 24-60 sats',
+          '→ 地球 DSN': '→ Earth DSN',
+          '激光通信 100Mbps-1Gbps': 'Laser Comm 100Mbps-1Gbps',
+          'LMO卫星（宽带接入）': 'LMO Satellite (Broadband Access)',
+          'MMO卫星（中继骨干）': 'MMO Satellite (Relay Backbone)',
+          'ArSO卫星（地火中继）': 'ArSO Satellite (Earth-Mars Relay)',
+          '地火激光链路': 'Earth-Mars Laser Link',
+          '图例 Legend': 'Legend'
+        },
+        // SDN architecture SVG
+        '#sdn svg text': {
+          '🌍 地球段（被动端）': '🌍 Earth Segment (Passive)',
+          '🌌 深空激光骨干 · ISL层': '🌌 Deep-space Laser Backbone · ISL Layer',
+          '🔴 火星本地自治SDN（核心创新层）': '🔴 Mars Local Autonomous SDN (Core Innovation)',
+          '🏗️ 火星表面网络': '🏗️ Mars Surface Network',
+          '地球DSN控制中心': 'Earth DSN Control Center',
+          '仅接收数据，不参与火星实时路由': 'Receives data only, no Mars real-time routing',
+          '地火激光终端': 'Earth-Mars Laser Terminal',
+          'ISL中继': 'ISL Relay',
+          '🧠 火星SDN主控制器': '🧠 Mars SDN Master Controller',
+          '运行于基地计算中心': 'Running on Base Computing Center',
+          '完整星历数据库': 'Complete Ephemeris Database',
+          '实时拓扑感知': 'Real-time Topology Awareness',
+          'QoS分层调度': 'QoS Layered Scheduling',
+          '太阳合自治模式 · 14天完全独立运行': 'Conjunction Autonomous Mode · 14-day Full Independence',
+          'LMO卫星群': 'LMO Satellite Group',
+          'MMO卫星群': 'MMO Satellite Group',
+          'SDN交换节点': 'SDN Switch Node',
+          '基地核心网': 'Base Core Network',
+          '有线骨干 + 无线接入': 'Wired Backbone + Wireless Access',
+          '巡视器/机器人': 'Rover/Robot',
+          '远程着陆器': 'Remote Lander',
+          '全双工自主建链': 'Full-Duplex Auto Link',
+          '握手建链机制': 'Handshake Link Mechanism',
+          'DTN控制面': 'DTN Control Plane',
+          'Ka/X/UHF数据面': 'Ka/X/UHF Data Plane',
+          '激光 3-22min时延': 'Laser 3-22min Delay'
+        }
+      };
+
+      Object.keys(svgTextMap).forEach(function(svgSel) {
+        var svgEl = document.querySelector(svgSel);
+        if (!svgEl) return;
+        var texts = svgEl.querySelectorAll('text');
+        var map = svgTextMap[svgSel];
+        texts.forEach(function(t) {
+          var raw = t.textContent.trim();
+          if (isEn) {
+            if (map[raw]) {
+              if (!t.getAttribute('data-i18n-orig')) t.setAttribute('data-i18n-orig', t.textContent);
+              // Preserve child text nodes structure - simple replace for text-only nodes
+              if (t.childNodes.length === 1) {
+                t.textContent = map[raw];
+              } else {
+                // For multi-tspan or mixed, just set textContent
+                t.textContent = map[raw];
+              }
+            }
+          } else {
+            var orig = t.getAttribute('data-i18n-orig');
+            if (orig !== null) t.textContent = orig;
+          }
+        });
+      });
+
+      var earthSpecs = document.querySelectorAll('.terminal-card.earth .spec-key');
+      var earthSpecEn = ['Element Count', 'Frequency Band', 'ASIC Process', 'Radiation Hardening', 'Operating Temp', 'Dust Removal', 'Cost Target'];
+      earthSpecs.forEach(function(td, idx) {
+        if (idx < earthSpecEn.length) {
+          if (isEn) {
+            if (!td.getAttribute('data-i18n-orig')) td.setAttribute('data-i18n-orig', td.innerHTML);
+            td.innerHTML = earthSpecEn[idx];
+          } else {
+            var orig = td.getAttribute('data-i18n-orig');
+            if (orig !== null) td.innerHTML = orig;
+          }
+        }
+      });
+      var marsSpecs = document.querySelectorAll('.terminal-card.mars .spec-key');
+      var marsSpecEn = ['Element Count', 'Frequency Band', 'ASIC Process', 'Radiation Hardening', 'Operating Temp', 'Dust Removal', 'Cost Estimate'];
+      marsSpecs.forEach(function(td, idx) {
+        if (idx < marsSpecEn.length) {
+          if (isEn) {
+            if (!td.getAttribute('data-i18n-orig')) td.setAttribute('data-i18n-orig', td.innerHTML);
+            td.innerHTML = marsSpecEn[idx];
+          } else {
+            var orig = td.getAttribute('data-i18n-orig');
+            if (orig !== null) td.innerHTML = orig;
+          }
+        }
+      });
+    }
+
+    // Initialize language toggle on DOM ready
+    document.addEventListener('DOMContentLoaded', function() {
+      var btns = document.querySelectorAll('.lang-btn');
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener('click', function() {
+          var lang = this.getAttribute('data-lang');
+          setLanguage(lang);
+        });
+      }
+    });
+  })();
   </script>
 </body>
 </html>
