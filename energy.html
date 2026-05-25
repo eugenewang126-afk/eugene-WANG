@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>能源供应模块 · Energy Supply Module | 火星基地阿尔法</title>
+  <meta name="description" content="三轨并行发电架构详细设计：核裂变地表电源 + 原位气体热电转换 + 太阳能光伏，40kWe基线功率全天候保障。" />
+  <meta name="theme-color" content="#c1440e" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    :root {
+      --mars-red:#c1440e;--mars-orange:#e8621a;--mars-amber:#f4a234;--mars-dust:#d4956a;
+      --space-black:#03050a;--space-deep:#070d1a;--space-mid:#0d1b2e;--space-panel:#111c2e;
+      --space-card:#162235;--space-border:#1e3050;--space-hover:#1a2d48;
+      --text-primary:#e8f4fd;--text-secondary:#8bacc8;--text-muted:#4a6580;--text-accent:#f4a234;
+      --glow-red:rgba(193,68,14,0.35);--glow-amber:rgba(244,162,52,0.25);--glow-blue:rgba(56,139,230,0.20);
+      --green-ok:#22c55e;--yellow-warn:#eab308;--blue-info:#3b82f6;--purple:#a855f7;
+      --font-en:'Segoe UI','Helvetica Neue',Arial,sans-serif;
+      --font-zh:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+      --radius-sm:6px;--radius-md:12px;--radius-lg:20px;--radius-xl:32px;
+      --shadow-card:0 4px 32px rgba(0,0,0,0.5);
+      --transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;font-size:16px;}
+    body{background:var(--space-black);color:var(--text-primary);font-family:var(--font-zh);line-height:1.7;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 25%,rgba(193,68,14,0.06) 0%,transparent 50%),radial-gradient(ellipse at 85% 75%,rgba(56,139,230,0.05) 0%,transparent 50%);pointer-events:none;z-index:0;}
+    ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--space-deep);}::-webkit-scrollbar-thumb{background:var(--mars-orange);border-radius:3px;}
+
+    /* NAV */
+    #navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(3,5,10,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--space-border);height:64px;display:flex;align-items:center;padding:0 2rem;gap:1rem;}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+    .nav-logo-icon{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#e8621a,#c1440e 50%,#6b1f05);box-shadow:0 0 16px var(--glow-red);position:relative;overflow:hidden;flex-shrink:0;}
+    .nav-logo-icon::after{content:'';position:absolute;top:18%;left:20%;width:40%;height:15%;background:rgba(255,255,255,0.12);border-radius:50%;transform:rotate(-30deg);}
+    .nav-logo-text{display:flex;flex-direction:column;line-height:1.2;}
+    .nav-logo-en{font-size:0.78rem;font-family:var(--font-en);font-weight:700;letter-spacing:0.12em;color:var(--mars-amber);text-transform:uppercase;}
+    .nav-logo-zh{font-size:0.72rem;color:var(--text-secondary);letter-spacing:0.05em;}
+    .nav-links{display:flex;align-items:center;gap:0.2rem;margin-left:1.5rem;flex:1;}
+    .nav-link{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius-sm);text-decoration:none;font-size:0.82rem;color:var(--text-secondary);transition:var(--transition);white-space:nowrap;letter-spacing:0.02em;}
+    .nav-link:hover,.nav-link.active{color:var(--text-primary);background:var(--space-hover);}
+    .nav-link.active{color:var(--mars-amber);}
+    .nav-right{display:flex;align-items:center;gap:0.75rem;margin-left:auto;flex-shrink:0;}
+    .lang-toggle{display:flex;background:var(--space-panel);border:1px solid var(--space-border);border-radius:20px;overflow:hidden;padding:2px;}
+    .lang-btn{padding:4px 14px;border:none;background:transparent;color:var(--text-secondary);font-size:0.78rem;font-weight:600;cursor:pointer;border-radius:16px;transition:var(--transition);letter-spacing:0.05em;}
+    .lang-btn.active{background:var(--mars-orange);color:white;}
+    .btn-back{display:flex;align-items:center;gap:6px;padding:6px 16px;background:transparent;border:1px solid var(--space-border);border-radius:var(--radius-sm);color:var(--text-secondary);font-size:0.82rem;cursor:pointer;text-decoration:none;transition:var(--transition);}
+    .btn-back:hover{border-color:var(--mars-orange);color:var(--mars-amber);background:var(--space-hover);}
+
+    /* HERO */
+    #hero{position:relative;min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 2rem 3rem;z-index:1;overflow:hidden;}
+    .hero-bg{position:absolute;inset:0;z-index:0;overflow:hidden;}
+    .hero-planet{position:absolute;bottom:-200px;right:-150px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#f4a234 0%,#e8621a 25%,#c1440e 50%,#8b2000 72%,#3d0e00 90%,#1a0500 100%);opacity:0.12;animation:marsRotate 180s linear infinite;pointer-events:none;}
+    @keyframes marsRotate{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+    .hero-content{position:relative;z-index:1;max-width:900px;}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:5px 18px;background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.35);border-radius:30px;font-size:0.73rem;letter-spacing:0.15em;color:#eab308;text-transform:uppercase;font-family:var(--font-en);font-weight:700;margin-bottom:1.5rem;}
+    .hero-badge-dot{width:6px;height:6px;border-radius:50%;background:#eab308;animation:pulse-gold 1.5s infinite;}
+    @keyframes pulse-gold{0%,100%{box-shadow:0 0 0 0 rgba(234,179,8,0.6);}50%{box-shadow:0 0 0 6px rgba(234,179,8,0);}}
+    .hero-title{font-size:clamp(2rem,5vw,4rem);font-weight:800;line-height:1.1;letter-spacing:-0.02em;margin-bottom:1rem;}
+    .hero-title-en{display:block;background:linear-gradient(135deg,#f4a234 0%,#eab308 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:var(--font-en);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;}
+    .hero-title-zh{display:block;color:var(--text-primary);font-size:0.5em;font-weight:300;letter-spacing:0.25em;}
+    .hero-subtitle{max-width:700px;margin:0 auto 2rem;font-size:1rem;color:var(--text-secondary);line-height:1.8;}
+    .hero-stats{display:flex;gap:2px;background:var(--space-panel);border:1px solid var(--space-border);border-radius:var(--radius-lg);overflow:hidden;flex-wrap:wrap;justify-content:center;}
+    .stat-item{padding:16px 28px;text-align:center;border-right:1px solid var(--space-border);transition:var(--transition);}
+    .stat-item:last-child{border-right:none;}
+    .stat-item:hover{background:var(--space-hover);}
+    .stat-value{display:block;font-size:1.6rem;font-weight:800;font-family:var(--font-en);background:linear-gradient(135deg,#f4a234,#eab308);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;}
+    .stat-label{font-size:0.72rem;color:var(--text-secondary);letter-spacing:0.08em;margin-top:4px;}
+
+    /* CONTAINER */
+    .container{max-width:1280px;margin:0 auto;padding:0 2rem;}
+    .section-divider{border:none;height:1px;background:linear-gradient(90deg,transparent,var(--space-border),transparent);margin:4rem 0;}
+
+    /* INTRO SECTION */
+    #intro{padding:5rem 0 3rem;position:relative;z-index:1;}
+    .intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;}
+    .intro-text h2{font-size:1.8rem;font-family:var(--font-en);font-weight:800;margin-bottom:1rem;line-height:1.2;}
+    .intro-text h2 span{display:block;font-size:0.55em;font-weight:300;color:var(--text-secondary);letter-spacing:0.2em;margin-top:0.3rem;}
+    .intro-text p{color:var(--text-secondary);font-size:0.92rem;line-height:1.8;margin-bottom:1rem;}
+    .intro-text .highlight{color:var(--mars-amber);font-weight:600;}
+    .constraint-box{background:var(--space-card);border:1px solid var(--space-border);border-radius:var(--radius-md);padding:1.5rem;}
+    .constraint-box h3{font-size:0.8rem;font-family:var(--font-en);font-weight:700;letter-spacing:0.15em;color:var(--mars-orange);text-transform:uppercase;margin-bottom:1rem;}
+    .constraint-list{list-style:none;}
+    .constraint-list li{display:flex;gap:10px;padding:6px 0;font-size:0.82rem;color:var(--text-secondary);border-bottom:1px solid rgba(255,255,255,0.04);}
+    .constraint-list li:last-child{border-bottom:none;}
+    .constraint-list li::before{content:'◈';color:var(--mars-orange);flex-shrink:0;font-size:0.7rem;margin-top:2px;}
+    .constraint-list li strong{color:var(--text-primary);font-family:var(--font-en);margin-right:4px;}
+
+    /* ARCHITECTURE DIAGRAM */
+    #architecture{padding:4rem 0;position:relative;z-index:1;}
+    .arch-header{text-align:center;margin-bottom:3rem;}
+    .section-tag{display:inline-block;padding:4px 16px;background:rgba(193,68,14,0.12);border:1px solid rgba(193,68,14,0.3);border-radius:20px;font-size:0.7rem;font-family:var(--font-en);font-weight:700;letter-spacing:0.2em;color:var(--mars-orange);text-transform:uppercase;margin-bottom:1rem;}
+    .arch-header h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.2;}
+    .arch-header h2 .en{display:block;font-family:var(--font-en);letter-spacing:-0.01em;}
+    .arch-header h2 .zh{display:block;font-size:0.55em;font-weight:300;color:var(--text-secondary);letter-spacing:0.2em;margin-top:0.3rem;}
+    .arch-header p{color:var(--text-secondary);font-size:0.92rem;max-width:600px;margin:1rem auto 0;line-height:1.7;}
+
+    /* SVG Architecture Diagram */
+    .arch-diagram-wrap{background:var(--space-card);border:1px solid var(--space-border);border-radius:var(--radius-lg);padding:2rem;margin-bottom:2rem;position:relative;overflow:hidden;}
+    .arch-diagram-wrap::before{content:'⚡';position:absolute;top:1.5rem;right:2rem;font-size:5rem;opacity:0.05;line-height:1;}
+    .arch-svg{width:100%;max-width:1100px;margin:0 auto;display:block;}
+    .arch-svg text{font-family:'Segoe UI',Arial,sans-serif;}
+    .arch-svg .track-a-box{fill:#7c2d12;stroke:#c2410c;stroke-width:2;rx:8;}
+    .arch-svg .track-b-box{fill:#1c1917;stroke:#d97706;stroke-width:2;rx:8;}
+    .arch-svg .track-c-box{fill:#1e1b4b;stroke:#7c3aed;stroke-width:2;rx:8;}
+    .arch-svg .bus-box{fill:#0c1a2e;stroke:#3b82f6;stroke-width:2.5;rx:6;}
+    .arch-svg .storage-box{fill:#022c22;stroke:#16a34a;stroke-width:2;rx:6;}
+    .arch-svg .load-box{fill:#1c1917;stroke:#a855f7;stroke-width:2;rx:6;}
+    .arch-svg .arrow-line{stroke:#4a6580;stroke-width:1.5;fill:none;marker-end:url(#arrowhead);}
+    .arch-svg .dotted-line{stroke:#3b82f6;stroke-width:1.5;stroke-dasharray:6,4;fill:none;}
+    .arch-svg .waste-line{stroke:#22c55e;stroke-width:1.5;stroke-dasharray:4,3;fill:none;marker-end:url(#arrowhead-green);}
+
+    .arch-legend{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem;}
+    .legend-item{display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-secondary);}
+    .legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+    .legend-line{width:24px;height:2px;flex-shrink:0;}
+    .legend-dashed{width:24px;height:2px;background:repeating-linear-gradient(90deg,#3b82f6 0,#3b82f6 6px,transparent 6px,transparent 10px);flex-shrink:0;}
+
+    /* TRACK SECTIONS */
+    #tracks{padding:4rem 0;position:relative;z-index:1;}
+    .tracks-header{text-align:center;margin-bottom:3rem;}
+    .tracks-header h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.2;}
+    .tracks-header h2 .en{display:block;font-family:var(--font-en);letter-spacing:-0.01em;}
+    .tracks-header h2 .zh{display:block;font-size:0.55em;font-weight:300;color:var(--text-secondary);letter-spacing:0.2em;margin-top:0.3rem;}
+
+    .track-section{margin-bottom:4rem;}
+    .track-header{display:flex;align-items:flex-start;gap:1.5rem;margin-bottom:2rem;padding:1.5rem;background:var(--space-card);border:1px solid var(--space-border);border-radius:var(--radius-lg);position:relative;overflow:hidden;}
+    .track-header::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;width:100%;}
+    .track-a .track-header::before{background:linear-gradient(90deg,#c2410c,#f97316);}
+    .track-b .track-header::before{background:linear-gradient(90deg,#d97706,#fbbf24);}
+    .track-c .track-header::before{background:linear-gradient(90deg,#7c3aed,#a78bfa);}
+
+    .track-icon{width:64px;height:64px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;}
+    .track-a .track-icon{background:rgba(194,65,12,0.12);border:1px solid rgba(194,65,12,0.25);}
+    .track-b .track-icon{background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.25);}
+    .track-c .track-icon{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);}
+
+    .track-title{flex:1;}
+    .track-label{display:inline-block;font-size:0.65rem;font-family:var(--font-en);font-weight:700;letter-spacing:0.2em;padding:2px 10px;border-radius:10px;margin-bottom:0.5rem;text-transform:uppercase;}
+    .track-a .track-label{background:rgba(194,65,12,0.12);color:#f97316;border:1px solid rgba(194,65,12,0.25);}
+    .track-b .track-label{background:rgba(217,119,6,0.12);color:#fbbf24;border:1px solid rgba(217,119,6,0.25);}
+    .track-c .track-label{background:rgba(124,58,237,0.12);color:#a78bfa;border:1px solid rgba(124,58,237,0.25);}
+    .track-title h3{font-size:1.3rem;font-family:var(--font-en);font-weight:800;line-height:1.2;}
+    .track-title .zh-sub{font-size:0.82rem;color:var(--text-secondary);margin-top:4px;}
+    .track-status{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+    .status-badge{display:flex;align-items:center;gap:5px;font-size:0.68rem;font-family:var(--font-en);font-weight:700;padding:4px 10px;border-radius:10px;}
+    .status-baseline{background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid rgba(34,197,94,0.25);}
+    .status-research{background:rgba(234,179,8,0.1);color:#eab308;border:1px solid rgba(234,179,8,0.25);}
+    .status-active{background:rgba(59,130,246,0.1);color:#3b82f6;border:1px solid rgba(59,130,246,0.25);}
+    .status-dot{width:6px;height:6px;border-radius:50%;}
+    .status-baseline .status-dot{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,0.6);}
+    .status-research .status-dot{background:#eab308;box-shadow:0 0 6px rgba(234,179,8,0.6);}
+    .status-active .status-dot{background:#3b82f6;box-shadow:0 0 6px rgba(59,130,246,0.6);}
+
+    /* Metrics Grid */
+    .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem;}
+    .metric-card{background:var(--space-panel);border:1px solid var(--space-border);border-radius:var(--radius-md);padding:1rem 1.2rem;transition:var(--transition);}
+    .metric-card:hover{border-color:var(--mars-orange);background:var(--space-hover);}
+    .metric-value{font-size:1.5rem;font-weight:800;font-family:var(--font-en);color:var(--mars-amber);line-height:1.1;}
+    .metric-unit{font-size:0.7rem;color:var(--text-muted);font-weight:400;}
+    .metric-label{font-size:0.72rem;font-family:var(--font-en);color:var(--text-secondary);margin-top:4px;font-weight:600;}
+    .metric-zh{font-size:0.65rem;color:var(--text-muted);}
+
+    /* Content + Diagram Grid */
+    .track-content-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;}
+    .track-text h4{font-size:1rem;font-family:var(--font-en);font-weight:700;color:var(--text-primary);margin-bottom:0.8rem;padding-bottom:0.5rem;border-bottom:1px solid var(--space-border);}
+    .track-text p{font-size:0.85rem;color:var(--text-secondary);line-height:1.75;margin-bottom:0.8rem;}
+    .track-text .formula{background:var(--space-panel);border:1px solid var(--space-border);border-radius:var(--radius-sm);padding:0.8rem 1rem;margin:0.8rem 0;font-size:0.8rem;font-family:var(--font-en);color:var(--mars-amber);overflow-x:auto;}
+
+    /* Data Table */
+    .data-table-wrap{overflow-x:auto;border-radius:var(--radius-md);border:1px solid var(--space-border);margin:1rem 0;}
+    .data-table{width:100%;border-collapse:collapse;font-size:0.8rem;}
+    .data-table th{background:var(--space-panel);color:var(--text-secondary);font-family:var(--font-en);font-weight:700;font-size:0.68rem;letter-spacing:0.1em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--space-border);white-space:nowrap;text-transform:uppercase;}
+    .data-table td{padding:8px 14px;border-bottom:1px solid rgba(30,48,80,0.5);color:var(--text-secondary);vertical-align:middle;}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:hover td{background:var(--space-hover);}
+    .data-table .td-key{color:var(--text-primary);font-weight:600;white-space:nowrap;}
+    .data-table .td-val{font-family:var(--font-en);color:var(--mars-amber);font-weight:700;}
+    .data-table .td-note{font-size:0.7rem;color:var(--text-muted);}
+
+    /* Architecture mini SVG */
+    .mini-svg-wrap{background:var(--space-panel);border:1px solid var(--space-border);border-radius:var(--radius-md);padding:1rem;overflow-x:auto;}
+    .mini-svg{width:100%;min-width:400px;display:block;}
+
+    /* Storage Section */
+    #storage{padding:4rem 0;position:relative;z-index:1;}
+    .storage-header{text-align:center;margin-bottom:3rem;}
+    .storage-header h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.2;}
+    .storage-header h2 .en{display:block;font-family:var(--font-en);letter-spacing:-0.01em;}
+    .storage-header h2 .zh{display:block;font-size:0.55em;font-weight:300;color:var(--text-secondary);letter-spacing:0.2em;margin-top:0.3rem;}
+    .storage-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;}
+    .storage-tier{background:var(--space-card);border:1px solid var(--space-border);border-radius:var(--radius-lg);padding:1.5rem;transition:var(--transition);position:relative;overflow:hidden;}
+    .storage-tier::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+    .tier-1::before{background:linear-gradient(90deg,#ef4444,#f97316);}
+    .tier-2::before{background:linear-gradient(90deg,#3b82f6,#06b6d4);}
+    .tier-3::before{background:linear-gradient(90deg,#22c55e,#84cc16);}
+
+    .tier-header{display:flex;align-items:center;gap:12px;margin-bottom:1rem;}
+    .tier-num{font-size:1.8rem;font-weight:900;font-family:var(--font-en);opacity:0.2;line-height:1;}
+    .tier-title-en{font-size:0.88rem;font-family:var(--font-en);font-weight:800;color:var(--text-primary);}
+    .tier-title-zh{font-size:0.72rem;color:var(--text-muted);}
+    .tier-body{font-size:0.82rem;color:var(--text-secondary);line-height:1.7;margin-bottom:1rem;}
+    .tier-specs{display:flex;flex-wrap:wrap;gap:6px;}
+    .tier-spec{font-size:0.7rem;padding:3px 10px;background:rgba(255,255,255,0.04);border:1px solid var(--space-border);border-radius:10px;color:var(--text-secondary);font-family:var(--font-en);}
+
+    /* PMAD Section */
+    #pmad{padding:4rem 0;position:relative;z-index:1;}
+    .pmad-header{text-align:center;margin-bottom:3rem;}
+    .pmad-header h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.2;}
+    .pmad-header h2 .en{display:block;font-family:var(--font-en);letter-spacing:-0.01em;}
+    .pmad-header h2 .zh{display:block;font-size:0.55em;font-weight:300;color:var(--text-secondary);letter-spacing:0.2em;margin-top:0.3rem;}
+    .pmad-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+    .pmad-text h4{font-size:1rem;font-family:var(--font-en);font-weight:700;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--space-border);}
+    .pmad-text p{font-size:0.85rem;color:var(--text-secondary);line-height:1.75;margin-bottom:0.8rem;}
+    .priority-stack{background:var(--space-card);border:1px solid var(--space-border);border-radius:var(--radius-md);overflow:hidden;}
+    .priority-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--space-border);transition:var(--transition);}
+    .priority-item:last-child{border-bottom:none;}
+    .priority-item:hover{background:var(--space-hover);}
+    .priority-level{font-size:0.65rem;font-family:var(--font-en);font-weight:900;padding:3px 8px;border-radius:6px;flex-shrink:0;}
+    .p0{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);}
+    .p1{background:rgba(249,115,22,0.12);color:#f97316;border:1px solid rgba(249,115,22,0.25);}
+    .p2{background:rgba(234,179,8,0.12);color:#eab308;border:1px solid rgba(234,179,8,0.25);}
+    .p3{background:rgba(59,130,246,0.12);color:#3b82f6;border:1px solid rgba(59,130,246,0.25);}
+    .p4{background:rgba(168,85,247,0.12);color:#a855f7;border:1px solid rgba(168,85,247,0.25);}
+    .priority-desc{flex:1;font-size:0.82rem;color:var(--text-secondary);}
+    .priority-power{font-size:0.75rem;font-family:var(--font-en);color:var(--text-muted);flex-shrink:0;}
+
+    /* Thermal */
+    #thermal{padding:4rem 0;position:relative;z-index:1;}
+    .thermal-header{text-align:center;margin-bottom:3rem;}
+    .thermal-header h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.2;}
+    .thermal-header h2 .en{display:block;font-family:var(--font-en);letter-spacing:-0.01em;}
+    .thermal-header h2 .zh{display:block;font-size:0.55em;font-weight:300;color:var(--text-secondary);letter-spacing:0.2em;margin-top:0.3rem;}
+    .thermal-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;}
+    .thermal-text h4{font-size:1rem;font-family:var(--font-en);font-weight:700;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--space-border);}
+    .thermal-text p{font-size:0.85rem;color:var(--text-secondary);line-height:1.75;margin-bottom:0.8rem;}
+    .thermal-calc{background:var(--space-panel);border:1px solid var(--space-border);border-radius:var(--radius-md);padding:1rem 1.2rem;margin-top:1rem;}
+    .thermal-calc h5{font-size:0.78rem;font-family:var(--font-en);font-weight:700;color:var(--mars-amber);margin-bottom:0.8rem;letter-spacing:0.1em;}
+    .thermal-calc p{font-size:0.8rem;font-family:var(--font-en);color:var(--text-secondary);line-height:1.6;margin-bottom:0.5rem;}
+    .thermal-calc .result{color:var(--mars-amber);font-weight:700;}
+
+    /* Roadmap */
+    #roadmap{padding:4rem 0;position:relative;z-index:1;}
+    .roadmap-header{text-align:center;margin-bottom:3rem;}
+    .roadmap-header h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.2;}
+    .roadmap-header h2 .en{display:block;font-family:var(--font-en);letter-spacing:-0.01em;}
+    .roadmap-header h2 .zh{display:block;font-size:0.55em;font-weight:300;color:var(--text-secondary);letter-spacing:0.2em;margin-top:0.3rem;}
+    .phase-timeline{position:relative;padding-left:3rem;}
+    .phase-timeline::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#e8621a,#c1440e 70%,transparent);}
+    .phase-item{position:relative;margin-bottom:2rem;animation:fadeInLeft 0.6s ease both;}
+    .phase-item:nth-child(1){animation-delay:0.1s;}
+    .phase-item:nth-child(2){animation-delay:0.2s;}
+    .phase-item:nth-child(3){animation-delay:0.3s;}
+    .phase-item:nth-child(4){animation-delay:0.4s;}
+    @keyframes fadeInLeft{from{opacity:0;transform:translateX(-20px);}to{opacity:1;transform:translateX(0);}}
+    .phase-dot{position:absolute;left:-2.7rem;top:1rem;width:18px;height:18px;border-radius:50%;background:var(--space-card);border:3px solid var(--mars-orange);box-shadow:0 0 12px var(--glow-red);}
+    .phase-item:first-child .phase-dot{background:var(--mars-orange);animation:pulseDot 2s infinite;}
+    @keyframes pulseDot{0%,100%{box-shadow:0 0 0 0 rgba(232,98,26,0.5);}50%{box-shadow:0 0 0 8px rgba(232,98,26,0);}}
+    .phase-card{background:var(--space-card);border:1px solid var(--space-border);border-radius:var(--radius-md);padding:1.5rem 2rem;transition:var(--transition);}
+    .phase-card:hover{border-color:rgba(193,68,14,0.4);transform:translateX(4px);}
+    .phase-tag{display:inline-block;font-size:0.68rem;font-family:var(--font-en);font-weight:700;letter-spacing:0.15em;padding:2px 10px;background:rgba(193,68,14,0.12);border:1px solid rgba(193,68,14,0.25);border-radius:10px;color:var(--mars-orange);margin-bottom:0.7rem;text-transform:uppercase;}
+    .phase-title{font-size:1.05rem;font-family:var(--font-en);font-weight:800;color:var(--text-primary);margin-bottom:3px;}
+    .phase-zh{font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.8rem;}
+    .phase-items{display:flex;flex-wrap:wrap;gap:6px;}
+    .phase-chip{padding:4px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--space-border);border-radius:12px;font-size:0.72rem;color:var(--text-secondary);}
+    .phase-power{font-size:0.78rem;font-family:var(--font-en);color:var(--mars-amber);font-weight:700;margin-top:0.8rem;}
+
+    /* Summary Table */
+    #summary{padding:4rem 0;position:relative;z-index:1;}
+    .summary-header{text-align:center;margin-bottom:3rem;}
+    .summary-header h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.2;}
+    .summary-header h2 .en{display:block;font-family:var(--font-en);letter-spacing:-0.01em;}
+    .summary-header h2 .zh{display:block;font-size:0.55em;font-weight:300;color:var(--text-secondary);letter-spacing:0.2em;margin-top:0.3rem;}
+    .summary-table-wrap{overflow-x:auto;border-radius:var(--radius-md);border:1px solid var(--space-border);}
+    .summary-table{width:100%;border-collapse:collapse;font-size:0.8rem;min-width:800px;}
+    .summary-table th{background:var(--space-panel);color:var(--text-secondary);font-family:var(--font-en);font-weight:700;font-size:0.68rem;letter-spacing:0.1em;padding:12px 16px;text-align:left;border-bottom:1px solid var(--space-border);white-space:nowrap;text-transform:uppercase;}
+    .summary-table td{padding:10px 16px;border-bottom:1px solid rgba(30,48,80,0.5);color:var(--text-secondary);vertical-align:middle;}
+    .summary-table tr:last-child td{border-bottom:none;}
+    .summary-table tr:hover td{background:var(--space-hover);}
+    .summary-table .td-name{color:var(--text-primary);font-weight:700;font-family:var(--font-en);white-space:nowrap;}
+    .summary-table .td-power{font-family:var(--font-en);color:var(--mars-amber);font-weight:700;}
+    .summary-table .td-trl{font-family:var(--font-en);font-weight:700;}
+    .trl-high{color:#22c55e;}
+    .trl-mid{color:#eab308;}
+    .trl-low{color:#3b82f6;}
+
+    /* Footer */
+    footer{background:var(--space-deep);border-top:1px solid var(--space-border);padding:2rem;text-align:center;color:var(--text-muted);font-size:0.8rem;position:relative;z-index:1;}
+    footer a{color:var(--mars-amber);text-decoration:none;}
+    footer a:hover{text-decoration:underline;}
+
+    /* Responsive */
+    @media(max-width:900px){
+      .intro-grid,.track-content-grid,.pmad-grid,.thermal-grid{grid-template-columns:1fr;}
+      .storage-tiers{grid-template-columns:1fr;}
+    }
+    @media(max-width:768px){
+      .hero-stats{flex-direction:column;}
+      .stat-item{border-right:none;border-bottom:1px solid var(--space-border);}
+      .stat-item:last-child{border-bottom:none;}
+      .track-header{flex-wrap:wrap;}
+      .track-status{width:100%;flex-direction:row;align-items:center;}
+      .nav-links{display:none;}
+    }
+
+    /* Scroll animations */
+    .fade-section{opacity:0;transform:translateY(20px);transition:opacity 0.7s ease,transform 0.7s ease;}
+    .fade-section.visible{opacity:1;transform:translateY(0);}
+
+    /* Tab switcher for each track */
+    .track-tabs{display:flex;gap:2px;background:var(--space-panel);border:1px solid var(--space-border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:1.5rem;}
+    .track-tab{flex:1;padding:8px 16px;background:transparent;border:none;color:var(--text-secondary);font-size:0.8rem;font-family:var(--font-en);font-weight:600;cursor:pointer;transition:var(--transition);text-align:center;}
+    .track-tab:hover{background:var(--space-hover);color:var(--text-primary);}
+    .track-tab.active{background:rgba(193,68,14,0.15);color:var(--mars-amber);}
+    .track-tab-content{display:none;}
+    .track-tab-content.active{display:block;}
+
+    /* Comparison cards */
+    .compare-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:1rem;}
+    .compare-card{background:var(--space-panel);border:1px solid var(--space-border);border-radius:var(--radius-sm);padding:1rem;overflow-x:auto;}
+    .compare-card h5{font-size:0.78rem;font-family:var(--font-en);font-weight:700;color:var(--mars-amber);margin-bottom:0.8rem;letter-spacing:0.08em;}
+    .compare-card table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+    .compare-card td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:top;}
+    .compare-card tr:last-child td{border-bottom:none;}
+    .compare-card .ck{color:var(--text-primary);font-weight:600;white-space:nowrap;}
+    .compare-card .cv{font-family:var(--font-en);color:var(--mars-amber);text-align:right;}
+    .compare-card .ca{color:#22c55e;font-size:0.7rem;}
+    .compare-card .cb{color:#ef4444;font-size:0.7rem;}
+
+    /* MOXIE section */
+    .moxie-box{background:linear-gradient(135deg,rgba(56,139,230,0.08),rgba(59,130,246,0.05));border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius-md);padding:1.5rem;margin-top:1.5rem;}
+    .moxie-box h4{font-size:0.85rem;font-family:var(--font-en);font-weight:700;color:#3b82f6;margin-bottom:1rem;}
+    .moxie-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:1rem;}
+    .moxie-stat{text-align:center;}
+    .moxie-stat-val{font-size:1.4rem;font-weight:800;font-family:var(--font-en);color:#3b82f6;}
+    .moxie-stat-label{font-size:0.7rem;color:var(--text-muted);font-family:var(--font-en);}
+
+    /* Flowchart SVG */
+    .flowchart-wrap{background:var(--space-panel);border:1px solid var(--space-border);border-radius:var(--radius-md);padding:1.5rem;overflow-x:auto;}
+    .flowchart-svg{width:100%;min-width:500px;display:block;}
+
+    /* Integration diagram */
+    .integration-wrap{background:var(--space-card);border:1px solid var(--space-border);border-radius:var(--radius-lg);padding:2rem;overflow-x:auto;}
+    .integration-svg{width:100%;min-width:700px;display:block;}
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header>
+    <nav id="navbar" role="navigation" aria-label="主导航">
+      <a href="index.html" class="nav-logo" aria-label="Mars Base Alpha 首页">
+        <div class="nav-logo-icon" aria-hidden="true"></div>
+        <div class="nav-logo-text">
+          <span class="nav-logo-en">Mars Base Alpha</span>
+          <span class="nav-logo-zh">火星基地阿尔法</span>
+        </div>
+      </a>
+      <div class="nav-links" role="menubar">
+        <a href="index.html#overview" class="nav-link">概览</a>
+        <a href="energy.html" class="nav-link active" aria-current="page">能源</a>
+        <a href="index.html#roadmap" class="nav-link">路线</a>
+        <a href="index.html#updates" class="nav-link">动态</a>
+      </div>
+      <div class="nav-right">
+        <a href="index.html" class="btn-back">← 返回首页</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section id="hero" aria-labelledby="hero-title">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-planet"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="hero-badge-dot" aria-hidden="true"></span>
+        <span>Section 3.1 · Energy Supply Module</span>
+      </div>
+      <h1 id="hero-title" class="hero-title">
+        <span class="hero-title-en">Energy Supply Module</span>
+        <span class="hero-title-zh">能源供应模块 · 三轨并行发电架构</span>
+      </h1>
+      <p class="hero-subtitle">
+        基于火星物理约束方程的唯一解——核裂变地表电源（基荷主力）+ 原位气体热电转换（ISRU）+ 太阳能光伏（弹性补充），三轨并行确保40kWe基线功率全天候不间断供应。
+      </p>
+      <div class="hero-stats" role="region" aria-label="关键数据">
+        <div class="stat-item">
+          <span class="stat-value">40<span class="metric-unit" style="font-size:0.8rem;"> kWe</span></span>
+          <span class="stat-label">基线功率</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">2<span class="metric-unit" style="font-size:0.8rem;"> MWe</span></span>
+          <span class="stat-label">满负荷规模</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">25-30<span class="metric-unit" style="font-size:0.8rem;">%</span></span>
+          <span class="stat-label">斯特林效率</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">≥50<span class="metric-unit" style="font-size:0.8rem;"> m</span></span>
+          <span class="stat-label">反应堆安全距离</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section id="intro" aria-labelledby="intro-title">
+    <div class="container">
+      <div class="intro-grid fade-section">
+        <div class="intro-text">
+          <h2 id="intro-title">
+            <span>第一性原理：从约束方程出发</span>
+          </h2>
+          <p>火星能源系统不是地球能源系统的简单缩减版，而是一套由火星物理约束方程<strong class="highlight">唯一决定</strong>的全新工程解。所有设计决策必须从约束边界出发，不能依赖"够用就行"的工程直觉。</p>
+          <p>地球能源工程积累的经验在火星上大部分不适用——火星大气密度仅为地球的1.6%，导致对流散热完全失效；太阳辐照度仅为地球的43%，使光伏效率大打折扣；全球性尘暴可遮蔽99%的阳光；昼夜温差超过80°C，对材料热疲劳提出极端要求。</p>
+          <p>基于NASA基线参数（40 kWe基线功率需求）、SpaceX推进剂工厂数据（2 MWe满负荷规模）以及中国科学技术大学最新CO₂工质研究成果，构建三轨并行、互为备份的完整能源体系。</p>
+        </div>
+        <div class="constraint-box">
+          <h3>◈ 物理约束边界</h3>
+          <ul class="constraint-list">
+            <li><strong>太阳常数:</strong> ~591 W/m²（火星），仅为地球的43%</li>
+            <li><strong>大气密度:</strong> 610 Pa = 地球的1.6%，对流散热失效</li>
+            <li><strong>全球尘暴:</strong> 平均每3个火星年发生一次，遮蔽率达99%</li>
+            <li><strong>昼夜温差:</strong> -130°C ~ +20°C，热循环极端</li>
+            <li><strong>通信时延:</strong> 3~22分钟，无法实时地球控制</li>
+            <li><strong>任务窗口:</strong> ~26个月一次，备份物资上限严格</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ARCHITECTURE DIAGRAM -->
+  <section id="architecture" aria-labelledby="arch-title">
+    <div class="container">
+      <div class="arch-header fade-section">
+        <span class="section-tag">System Architecture</span>
+        <h2 id="arch-title">
+          <span class="en">Three-Track Parallel Power Architecture</span>
+          <span class="zh">三轨并行发电架构 · 系统集成总图</span>
+        </h2>
+        <p>核裂变FSP提供全天候基荷，原位气体热电转换利用火星CO₂大气实现零运输成本发电，太阳能光伏作为弹性补充。三轨汇入高压直流母线，经三层储能缓冲后分级供给各类负载。</p>
+      </div>
+
+      <div class="arch-diagram-wrap fade-section">
+        <!-- Main Architecture SVG -->
+        <svg class="arch-svg" viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="火星三轨并行发电架构图">
+          <defs>
+            <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#4a6580"/>
+            </marker>
+            <marker id="arrowhead-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#22c55e"/>
+            </marker>
+            <marker id="arrowhead-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#3b82f6"/>
+            </marker>
+            <filter id="glow-orange" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="glow-blue" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- ===================== TRACK A: FISSION ===================== -->
+          <g transform="translate(20,20)">
+            <!-- Background panel -->
+            <rect class="track-a-box" x="0" y="0" width="320" height="100" rx="8"/>
+            <text x="16" y="24" font-size="10" font-weight="700" fill="#f97316" letter-spacing="1">TRACK A</text>
+            <text x="16" y="44" font-size="13" font-weight="800" fill="#e8f4fd" font-family="'Segoe UI',Arial">Fission Surface Power</text>
+            <text x="16" y="60" font-size="10" fill="#8bacc8">核裂变地表电源 · 基荷主力</text>
+
+            <!-- Sub-modules inside Track A -->
+            <rect x="16" y="68" width="88" height="26" rx="4" fill="#7c2d12" stroke="#c2410c" stroke-width="1"/>
+            <text x="60" y="85" font-size="9" fill="#e8f4fd" text-anchor="middle" font-weight="600">U-235 裂变堆</text>
+
+            <rect x="112" y="68" width="88" height="26" rx="4" fill="#7c2d12" stroke="#c2410c" stroke-width="1"/>
+            <text x="156" y="85" font-size="9" fill="#e8f4fd" text-anchor="middle" font-weight="600">斯特林转换器</text>
+
+            <rect x="208" y="68" width="88" height="26" rx="4" fill="#7c2d12" stroke="#c2410c" stroke-width="1"/>
+            <text x="252" y="79" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">电力调节</text>
+            <text x="252" y="89" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">PMAD</text>
+
+            <!-- Power output -->
+            <text x="16" y="106" font-size="9" fill="#f97316" font-weight="700">→ 40 kWe × N台</text>
+          </g>
+
+          <!-- ===================== TRACK B: IGTS ===================== -->
+          <g transform="translate(20,140)">
+            <rect class="track-b-box" x="0" y="0" width="320" height="100" rx="8"/>
+            <text x="16" y="24" font-size="10" font-weight="700" fill="#fbbf24" letter-spacing="1">TRACK B</text>
+            <text x="16" y="44" font-size="13" font-weight="800" fill="#e8f4fd" font-family="'Segoe UI',Arial">In-Situ Gas Thermoelectric</text>
+            <text x="16" y="60" font-size="10" fill="#8bacc8">原位气体热电转换 · CO₂工质布雷顿循环</text>
+
+            <rect x="16" y="68" width="64" height="26" rx="4" fill="#292524" stroke="#d97706" stroke-width="1"/>
+            <text x="48" y="79" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">大气采集</text>
+            <text x="48" y="89" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">ACCU</text>
+
+            <rect x="88" y="68" width="64" height="26" rx="4" fill="#292524" stroke="#d97706" stroke-width="1"/>
+            <text x="120" y="79" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">热源驱动</text>
+            <text x="120" y="89" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">800-1000°C</text>
+
+            <rect x="160" y="68" width="64" height="26" rx="4" fill="#292524" stroke="#d97706" stroke-width="1"/>
+            <text x="192" y="85" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">布雷顿透平</text>
+
+            <rect x="232" y="68" width="64" height="26" rx="4" fill="#292524" stroke="#d97706" stroke-width="1"/>
+            <text x="264" y="79" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">发电机</text>
+            <text x="264" y="89" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">CO₂工质</text>
+
+            <text x="16" y="106" font-size="9" fill="#fbbf24" font-weight="700">→ 10-100 kWe · ISRU零运输成本</text>
+          </g>
+
+          <!-- ===================== TRACK C: SOLAR PV ===================== -->
+          <g transform="translate(20,260)">
+            <rect class="track-c-box" x="0" y="0" width="320" height="100" rx="8"/>
+            <text x="16" y="24" font-size="10" font-weight="700" fill="#a78bfa" letter-spacing="1">TRACK C</text>
+            <text x="16" y="44" font-size="13" font-weight="800" fill="#e8f4fd" font-family="'Segoe UI',Arial">Solar Photovoltaic</text>
+            <text x="16" y="60" font-size="10" fill="#8bacc8">太阳能光伏 · 弹性补充 + 尘暴监测</text>
+
+            <rect x="16" y="68" width="72" height="26" rx="4" fill="#1e1b4b" stroke="#7c3aed" stroke-width="1"/>
+            <text x="52" y="79" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">三结GaAs</text>
+            <text x="52" y="89" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">η=30%</text>
+
+            <rect x="96" y="68" width="72" height="26" rx="4" fill="#1e1b4b" stroke="#7c3aed" stroke-width="1"/>
+            <text x="132" y="79" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">EDS静电</text>
+            <text x="132" y="89" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">主动除尘</text>
+
+            <rect x="176" y="68" width="72" height="26" rx="4" fill="#1e1b4b" stroke="#7c3aed" stroke-width="1"/>
+            <text x="212" y="79" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">MPPT</text>
+            <text x="212" y="89" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">最大功率</text>
+
+            <rect x="256" y="68" width="48" height="26" rx="4" fill="#1e1b4b" stroke="#7c3aed" stroke-width="1"/>
+            <text x="280" y="85" font-size="8" fill="#e8f4fd" text-anchor="middle" font-weight="600">储能</text>
+
+            <text x="16" y="106" font-size="9" fill="#a78bfa" font-weight="700">→ 5-20 kWe · 弹性补充 + 峰值削峰</text>
+          </g>
+
+          <!-- ===================== DC BUS ===================== -->
+          <g transform="translate(380,120)">
+            <rect class="bus-box" x="0" y="0" width="200" height="160" rx="6" filter="url(#glow-blue)"/>
+            <text x="100" y="28" font-size="12" font-weight="800" fill="#60a5fa" text-anchor="middle" font-family="'Segoe UI',Arial">HVDC 直流母线</text>
+            <text x="100" y="46" font-size="10" fill="#3b82f6" text-anchor="middle">270V DC / 1000V DC</text>
+
+            <rect x="12" y="56" width="176" height="20" rx="4" fill="#0c1a2e" stroke="#3b82f6" stroke-width="1"/>
+            <text x="100" y="70" font-size="9" fill="#8bacc8" text-anchor="middle">⚡ 固态断路器保护</text>
+
+            <rect x="12" y="82" width="176" height="20" rx="4" fill="#0c1a2e" stroke="#3b82f6" stroke-width="1"/>
+            <text x="100" y="96" font-size="9" fill="#8bacc8" text-anchor="middle">🔄 PMAD 智能功率调度</text>
+
+            <rect x="12" y="108" width="176" height="20" rx="4" fill="#0c1a2e" stroke="#3b82f6" stroke-width="1"/>
+            <text x="100" y="122" font-size="9" fill="#8bacc8" text-anchor="middle">📊 状态监测与故障隔离</text>
+
+            <text x="100" y="148" font-size="10" fill="#3b82f6" text-anchor="middle" font-weight="700">双向功率流 · 双向保护</text>
+          </g>
+
+          <!-- ===================== STORAGE ===================== -->
+          <g transform="translate(620,20)">
+            <text x="0" y="0" font-size="11" font-weight="800" fill="#e8f4fd" font-family="'Segoe UI',Arial" letter-spacing="1">STORAGE LAYER</text>
+            <text x="0" y="16" font-size="9" fill="#4a6580">储能层 · 三层架构</text>
+
+            <!-- Tier 1 -->
+            <rect class="storage-box" x="0" y="28" width="180" height="52" rx="6" style="fill:#1c1917;stroke:#ef4444;stroke-width:1.5"/>
+            <text x="10" y="48" font-size="9" font-weight="800" fill="#ef4444">S1 · 火星气电池</text>
+            <text x="10" y="62" font-size="8" fill="#8bacc8">CO₂电化学 · 0°C稳定</text>
+            <text x="10" y="74" font-size="8" fill="#4a6580">短时高功率 · 充放循环</text>
+
+            <!-- Tier 2 -->
+            <rect class="storage-box" x="0" y="88" width="180" height="52" rx="6" style="fill:#1c1917;stroke:#3b82f6;stroke-width:1.5"/>
+            <text x="10" y="108" font-size="9" font-weight="800" fill="#3b82f6">S2 · PCM相变储热</text>
+            <text x="10" y="122" font-size="8" fill="#8bacc8">NaNO₂ · 熔点271°C</text>
+            <text x="10" y="134" font-size="8" fill="#4a6580">中等时长 · 跨昼夜热缓冲</text>
+
+            <!-- Tier 3 -->
+            <rect class="storage-box" x="0" y="148" width="180" height="52" rx="6" style="fill:#1c1917;stroke:#22c55e;stroke-width:1.5"/>
+            <text x="10" y="168" font-size="9" font-weight="800" fill="#22c55e">S3 · 飞轮储能 FES</text>
+            <text x="10" y="182" font-size="8" fill="#8bacc8">真空磁悬浮 · 60,000 rpm</text>
+            <text x="10" y="194" font-size="8" fill="#4a6580">毫秒级 · 功率平滑调节</text>
+          </g>
+
+          <!-- ===================== WASTE HEAT UTILIZATION ===================== -->
+          <g transform="translate(620,228)">
+            <text x="0" y="0" font-size="11" font-weight="800" fill="#22c55e" font-family="'Segoe UI',Arial" letter-spacing="1">WASTE HEAT</text>
+            <text x="0" y="16" font-size="9" fill="#4a6580">余热梯级利用 · 热-电-氧闭环</text>
+
+            <rect x="0" y="28" width="180" height="36" rx="4" fill="#022c22" stroke="#22c55e" stroke-width="1"/>
+            <text x="90" y="47" font-size="9" fill="#22c55e" text-anchor="middle" font-weight="700">高温段 >600°C → SOEC制O₂</text>
+            <text x="90" y="59" font-size="8" fill="#8bacc8" text-anchor="middle">CO₂ + H₂O → O₂ + CO/H₂</text>
+
+            <rect x="0" y="72" width="180" height="36" rx="4" fill="#022c22" stroke="#22c55e" stroke-width="1"/>
+            <text x="90" y="91" font-size="9" fill="#22c55e" text-anchor="middle" font-weight="700">中温段 200-600°C → Sabatier</text>
+            <text x="90" y="103" font-size="8" fill="#8bacc8" text-anchor="middle">CO₂ + 4H₂ → CH₄ + 2H₂O</text>
+
+            <rect x="0" y="116" width="180" height="36" rx="4" fill="#022c22" stroke="#22c55e" stroke-width="1"/>
+            <text x="90" y="135" font-size="9" fill="#22c55e" text-anchor="middle" font-weight="700">低温段 0-200°C → 基地供热</text>
+            <text x="90" y="147" font-size="8" fill="#8bacc8" text-anchor="middle">补偿-63°C环境温度需求</text>
+          </g>
+
+          <!-- ===================== LOAD LAYER ===================== -->
+          <g transform="translate(840,20)">
+            <text x="0" y="0" font-size="11" font-weight="800" fill="#e8f4fd" font-family="'Segoe UI',Arial" letter-spacing="1">LOAD LAYER</text>
+            <text x="0" y="16" font-size="9" fill="#4a6580">负载层级 · 优先级调度</text>
+
+            <!-- L0 -->
+            <rect x="0" y="28" width="240" height="36" rx="4" style="fill:#1c1917;stroke:#ef4444;stroke-width:1.5"/>
+            <text x="120" y="48" font-size="10" fill="#ef4444" text-anchor="middle" font-weight="800">L0 · 生存级负载</text>
+            <text x="120" y="60" font-size="8" fill="#8bacc8" text-anchor="middle">通信/计算/热防护 · 2-5 kWe · 永不中断</text>
+
+            <!-- L1 -->
+            <rect x="0" y="72" width="240" height="36" rx="4" style="fill:#1c1917;stroke:#f97316;stroke-width:1.5"/>
+            <text x="120" y="92" font-size="10" fill="#f97316" text-anchor="middle" font-weight="800">L1 · 运行级负载</text>
+            <text x="120" y="104" font-size="8" fill="#8bacc8" text-anchor="middle">科学仪器/机器人 · 10-20 kWe</text>
+
+            <!-- L2 -->
+            <rect x="0" y="116" width="240" height="36" rx="4" style="fill:#1c1917;stroke:#eab308;stroke-width:1.5"/>
+            <text x="120" y="136" font-size="10" fill="#eab308" text-anchor="middle" font-weight="800">L2 · 扩展级负载</text>
+            <text x="120" y="148" font-size="8" fill="#8bacc8" text-anchor="middle">ISRU/3D打印建造 · 40-100 kWe</text>
+
+            <!-- L3 -->
+            <rect x="0" y="160" width="240" height="36" rx="4" style="fill:#1c1917;stroke:#a855f7;stroke-width:1.5"/>
+            <text x="120" y="180" font-size="10" fill="#a855f7" text-anchor="middle" font-weight="800">L3 · 规模化负载</text>
+            <text x="120" y="192" font-size="8" fill="#8bacc8" text-anchor="middle">推进剂工厂 · 1-2 MWe（远期）</text>
+          </g>
+
+          <!-- ===================== CONNECTOR LINES ===================== -->
+          <!-- Track A → Bus -->
+          <line x1="340" y1="70" x2="380" y2="170" class="arrow-line" marker-end="url(#arrowhead)"/>
+          <!-- Track B → Bus -->
+          <line x1="340" y1="190" x2="380" y2="170" class="arrow-line" marker-end="url(#arrowhead)"/>
+          <!-- Track C → Bus -->
+          <line x1="340" y1="310" x2="380" y2="170" class="arrow-line" marker-end="url(#arrowhead)"/>
+          <!-- Bus ↔ Storage -->
+          <line x1="580" y1="120" x2="620" y2="90" class="dotted-line" marker-end="url(#arrowhead-blue)"/>
+          <line x1="620" y1="70" x2="580" y2="120" class="dotted-line"/>
+          <!-- Bus ↔ Waste Heat -->
+          <line x1="580" y1="200" x2="620" y2="246" class="waste-line" marker-end="url(#arrowhead-green)"/>
+          <!-- Bus → Load -->
+          <line x1="580" y1="200" x2="840" y2="178" class="arrow-line" marker-end="url(#arrowhead)"/>
+
+          <!-- Labels on lines -->
+          <text x="362" y="130" font-size="8" fill="#4a6580" transform="rotate(-35,362,130)">40kWe</text>
+          <text x="362" y="235" font-size="8" fill="#4a6580" transform="rotate(35,362,235)">10-100kWe</text>
+          <text x="362" y="355" font-size="8" fill="#4a6580" transform="rotate(50,362,355)">5-20kWe</text>
+        </svg>
+      </div>
+
+      <div class="arch-legend fade-section">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#c2410c;"></div>
+          <span>轨道A：核裂变地表电源</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#d97706;"></div>
+          <span>轨道B：原位气体热电转换</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#7c3aed;"></div>
+          <span>轨道C：太阳能光伏</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dashed"></div>
+          <span>储能双向功率流</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background:#22c55e;"></div>
+          <span>余热利用链路</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- TRACK A: FISSION SURFACE POWER -->
+  <section id="tracks" class="fade-section">
+    <div class="container">
+      <div class="tracks-header">
+        <span class="section-tag">Track A · B · C</span>
+        <h2>
+          <span class="en">Three Power Generation Tracks</span>
+          <span class="zh">三条发电技术路线 · 详细工程设计</span>
+        </h2>
+      </div>
+
+      <!-- TRACK A -->
+      <div class="track-section track-a">
+        <div class="track-header">
+          <div class="track-icon">☢️</div>
+          <div class="track-title">
+            <span class="track-label">Track A</span>
+            <h3>核裂变地表电源 Fission Surface Power</h3>
+            <p class="zh-sub">基荷主力 · 全天候独立于太阳辐照 · NASA/DOE联合推进</p>
+          </div>
+          <div class="track-status">
+            <span class="status-badge status-baseline"><span class="status-dot"></span> NASA/DOE基线</span>
+            <span class="status-badge status-active"><span class="status-dot"></span> TRL 6/9</span>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-value">400<span class="metric-unit"> kWth</span></div>
+            <div class="metric-label">Thermal Power</div>
+            <div class="metric-zh">热功率</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">40<span class="metric-unit"> kWe</span></div>
+            <div class="metric-label">Electric Power</div>
+            <div class="metric-zh">电功率（单台）</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">800-1000<span class="metric-unit"> K</span></div>
+            <div class="metric-label">Operating Temperature</div>
+            <div class="metric-zh">工作温度</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">25-30<span class="metric-unit">%</span></div>
+            <div class="metric-label">Stirling Efficiency</div>
+            <div class="metric-zh">斯特林转换效率</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">≥50<span class="metric-unit"> m</span></div>
+            <div class="metric-label">Reactor Distance</div>
+            <div class="metric-zh">反应堆安全距离</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">10+<span class="metric-unit"> yr</span></div>
+            <div class="metric-label">Design Life</div>
+            <div class="metric-zh">设计寿命</div>
+          </div>
+        </div>
+
+        <div class="track-content-grid">
+          <div class="track-text">
+            <h4>工作原理与物理基础</h4>
+            <p>核裂变地表电源（FSP）利用铀-235受控裂变产生的400 kWth热功率，通过斯特林（Stirling）热机循环转换为40 kWe电能。斯特林引擎相比传统RTG使用的热电材料（效率约6%-8%），效率提升至25%-30%，是火星高功率应用的最佳选择。</p>
+
+            <h4>效率推导（第一性原理）</h4>
+            <div class="formula">η<sub>Stirling</sub> = η<sub>Carnot</sub> × η<sub>实际修正</sub><br/>
+= (1 - T<sub>冷</sub>/T<sub>热</sub>) × 0.6<br/>
+= (1 - 200K/1000K) × 0.6 ≈ <strong>48%</strong><br/>
+实际工程效率 ≈ <strong>25-30%</strong>（含机械摩擦、热损失）</div>
+            <p>火星上对流散热几乎完全失效（大气密度仅为地球1.6%），因此热端温度（800-1000K）主要通过辐射散热排热。3m处目标剂量率 &lt;25 μSv/h。</p>
+
+            <h4>安全布局设计</h4>
+            <p>核反应堆置于基地≥50m距离处，利用火星岩石和土堆作为天然屏蔽层。高压直流电缆（HVDC）从反应堆连接至基地电力管理分配系统（PMAD），屏蔽参数满足3m处剂量率&lt;25 μSv/h的职业暴露限值。</p>
+          </div>
+          <div class="mini-svg-wrap">
+            <!-- FSP Layout SVG -->
+            <svg class="mini-svg" viewBox="0 0 420 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="核裂变地表电源布局图">
+              <defs>
+                <radialGradient id="reactor-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#c2410c" stop-opacity="0.6"/>
+                  <stop offset="100%" stop-color="#c2410c" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="shield-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#f97316" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#f97316" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <!-- Mars surface -->
+              <ellipse cx="210" cy="260" rx="200" ry="20" fill="#3d1a00" opacity="0.5"/>
+              <!-- Radiation field -->
+              <circle cx="100" cy="180" r="80" fill="url(#reactor-glow)" opacity="0.5"/>
+              <!-- Shield -->
+              <rect x="160" y="130" width="60" height="80" rx="4" fill="#292524" stroke="#f97316" stroke-width="2"/>
+              <text x="190" y="158" font-size="8" fill="#f97316" text-anchor="middle" font-weight="700">辐射</text>
+              <text x="190" y="170" font-size="8" fill="#f97316" text-anchor="middle" font-weight="700">屏蔽体</text>
+              <!-- Radiation waves -->
+              <path d="M100,180 L160,165" stroke="#f97316" stroke-width="1" stroke-dasharray="4,3" fill="none" opacity="0.6"/>
+              <path d="M100,180 L165,185" stroke="#f97316" stroke-width="1" stroke-dasharray="4,3" fill="none" opacity="0.6"/>
+              <!-- Reactor -->
+              <circle cx="100" cy="180" r="36" fill="#7c2d12" stroke="#c2410c" stroke-width="2"/>
+              <circle cx="100" cy="180" r="20" fill="#991b1b" stroke="#ef4444" stroke-width="1"/>
+              <text x="100" y="176" font-size="8" fill="#fca5a5" text-anchor="middle" font-weight="700">U-235</text>
+              <text x="100" y="188" font-size="7" fill="#fca5a5" text-anchor="middle">裂变堆</text>
+              <!-- Cable -->
+              <line x1="160" y1="170" x2="220" y2="170" stroke="#3b82f6" stroke-width="2.5"/>
+              <text x="190" y="162" font-size="8" fill="#3b82f6" text-anchor="middle">HVDC电缆</text>
+              <!-- Base -->
+              <rect x="220" y="130" width="120" height="80" rx="6" fill="#0c1a2e" stroke="#3b82f6" stroke-width="2"/>
+              <text x="280" y="158" font-size="9" fill="#e8f4fd" text-anchor="middle" font-weight="700">基地</text>
+              <text x="280" y="172" font-size="8" fill="#8bacc8" text-anchor="middle">PMAD配电系统</text>
+              <text x="280" y="186" font-size="8" fill="#8bacc8" text-anchor="middle">生命保障/通信</text>
+              <!-- Distance annotation -->
+              <line x1="100" y1="220" x2="220" y2="220" stroke="#4a6580" stroke-width="1"/>
+              <line x1="100" y1="216" x2="100" y2="224" stroke="#4a6580" stroke-width="1"/>
+              <line x1="220" y1="216" x2="220" y2="224" stroke="#4a6580" stroke-width="1"/>
+              <text x="160" y="234" font-size="9" fill="#4a6580" text-anchor="middle">≥50m 安全距离</text>
+              <!-- Distance note -->
+              <text x="190" y="60" font-size="8" fill="#eab308" text-anchor="middle">← 3m处剂量率 &lt;25 μSv/h →</text>
+              <!-- Labels -->
+              <text x="100" y="100" font-size="8" fill="#f97316" text-anchor="middle">热端 800-1000K</text>
+              <text x="100" y="112" font-size="8" fill="#f97316" text-anchor="middle">400 kWth</text>
+              <text x="280" y="230" font-size="8" fill="#3b82f6" text-anchor="middle">40 kWe 输出</text>
+              <!-- Shielding rocks -->
+              <ellipse cx="70" cy="210" rx="20" ry="12" fill="#4a3020" stroke="#6b4420" stroke-width="1"/>
+              <ellipse cx="130" cy="220" rx="15" ry="10" fill="#4a3020" stroke="#6b4420" stroke-width="1"/>
+              <text x="100" y="246" font-size="7" fill="#4a6580" text-anchor="middle">火星岩石屏蔽层</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="data-table-wrap fade-section">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>参数</th>
+                <th>数值</th>
+                <th>单位</th>
+                <th>备注</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="td-key">铀-235装量</td><td class="td-val">受控</td><td>—</td><td class="td-note">高丰度低浓缩铀（HALEU），防扩散设计</td></tr>
+              <tr><td class="td-key">热功率</td><td class="td-val">400</td><td>kWth</td><td class="td-note">NASA/DOE FSP项目基线参数</td></tr>
+              <tr><td class="td-key">电功率</td><td class="td-val">40</td><td>kWe</td><td class="td-note">单台，4台并联=160kWe峰值</td></tr>
+              <tr><td class="td-key">转换效率</td><td class="td-val">25-30</td><td>%</td><td class="td-note">斯特林引擎，理论上限~48%</td></tr>
+              <tr><td class="td-key">工作温度</td><td class="td-val">800-1000</td><td>K</td><td class="td-note">热端温度，影响辐射器设计</td></tr>
+              <tr><td class="td-key">安全隔离距离</td><td class="td-val">≥50</td><td>m</td><td class="td-note">3m处&lt;25μSv/h，符合职业暴露标准</td></tr>
+              <tr><td class="td-key">设计寿命</td><td class="td-val">10+</td><td>年</td><td class="td-note">远超一次任务周期（~26个月）</td></tr>
+              <tr><td class="td-key">部署方式</td><td class="td-val">地表</td><td>—</td><td class="td-note">非移动式，固定安装</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TRACK B: IGTS -->
+      <div class="track-section track-b">
+        <div class="track-header">
+          <div class="track-icon">🔄</div>
+          <div class="track-title">
+            <span class="track-label">Track B</span>
+            <h3>原位气体热电转换 In-Situ Gas Thermoelectric</h3>
+            <p class="zh-sub">CO₂布雷顿循环 · 中国科学技术大学最新研究 · ISRU零运输成本</p>
+          </div>
+          <div class="track-status">
+            <span class="status-badge status-research"><span class="status-dot"></span> USTC研究</span>
+            <span class="status-badge status-active"><span class="status-dot"></span> TRL 3-4</span>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-value">95+<span class="metric-unit">%</span></div>
+            <div class="metric-label">CO₂ Content</div>
+            <div class="metric-zh">火星大气CO₂含量</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">7.4-20.0<span class="metric-unit">%</span></div>
+            <div class="metric-label">Efficiency Gain</div>
+            <div class="metric-zh">相比He-Xe工质效率提升</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">1.0-14.2<span class="metric-unit">%</span></div>
+            <div class="metric-label">Power Density Gain</div>
+            <div class="metric-zh">功率密度提升</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">10-100<span class="metric-unit"> kWe</span></div>
+            <div class="metric-label">Power Range</div>
+            <div class="metric-zh">功率范围</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">800-1000<span class="metric-unit"> °C</span></div>
+            <div class="metric-label">Hot-side Temp</div>
+            <div class="metric-zh">热端温度</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">0<span class="metric-unit"> 运输成本</span></div>
+            <div class="metric-label">ISRU Advantage</div>
+            <div class="metric-zh">原位工质·零运输</div>
+          </div>
+        </div>
+
+        <div class="track-content-grid">
+          <div class="track-text">
+            <h4>物理原理：CO₂工质的独特优势</h4>
+            <p>中国科学技术大学研究团队发现，利用火星大气中的CO₂作为布雷顿循环工质，相比传统稀有气体（He-Xe）具有显著优势。关键在于CO₂的绝热指数γ=1.289，相比He-Xe（γ≈1.67）更接近1，使得压缩升温曲线更平缓，在火星低温散热边界条件下效率更优。</p>
+            <div class="formula">γ<sub>CO₂</sub> = 1.289 &nbsp;|&nbsp; γ<sub>He-Xe</sub> ≈ 1.670<br/>
+w<sub>net</sub> = c<sub>p</sub>·T<sub>1</sub>·[γ/(γ-1)(π<sup>(γ-1)/γ</sup>-1) - (π<sup>(γ-1)/γ</sup>-1)/η<sub>c</sub>]</div>
+            <p>火星大气CO₂含量高达95.3%，可直接从大气中采集，无需从地球运输——这是ISRU的核心价值：零运输成本、零有效载荷代价。</p>
+
+            <h4>布雷顿循环子系统架构</h4>
+            <p>亚临界气体布雷顿循环是火星独特散热环境和尺寸约束下的最优热电转化模式。系统由大气采集压缩单元（ACCU）→热源→透平膨胀机→发电机→低温散热器→压缩机组成闭环循环。</p>
+          </div>
+          <div class="flowchart-wrap">
+            <!-- IGTS Flowchart SVG -->
+            <svg class="flowchart-svg" viewBox="0 0 440 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="原位气体热电转换系统流程图">
+              <!-- Background grid -->
+              <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e3050" stroke-width="0.5"/>
+                </pattern>
+              </defs>
+              <rect width="440" height="320" fill="#0c1a2e" rx="6"/>
+              <rect width="440" height="320" fill="url(#grid)" rx="6" opacity="0.5"/>
+
+              <!-- Main cycle - large arrow -->
+              <!-- 1. ACCU - Atmospheric Collection -->
+              <rect x="20" y="130" width="80" height="50" rx="6" fill="#292524" stroke="#d97706" stroke-width="2"/>
+              <text x="60" y="152" font-size="9" fill="#fbbf24" text-anchor="middle" font-weight="700">🌬️ 大气采集</text>
+              <text x="60" y="166" font-size="8" fill="#e8f4fd" text-anchor="middle">ACCU</text>
+              <text x="60" y="178" font-size="7" fill="#8bacc8" text-anchor="middle">610Pa→工作压</text>
+
+              <!-- Arrow 1→2 -->
+              <line x1="100" y1="155" x2="125" y2="155" stroke="#d97706" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+              <!-- 2. Heat Source -->
+              <rect x="130" y="130" width="80" height="50" rx="6" fill="#7c2d12" stroke="#c2410c" stroke-width="2"/>
+              <text x="170" y="152" font-size="9" fill="#f97316" text-anchor="middle" font-weight="700">🔥 热源</text>
+              <text x="170" y="166" font-size="8" fill="#e8f4fd" text-anchor="middle">核热/太阳</text>
+              <text x="170" y="178" font-size="7" fill="#8bacc8" text-anchor="middle">800-1000°C</text>
+
+              <!-- Arrow 2→3 -->
+              <line x1="210" y1="155" x2="235" y2="155" stroke="#d97706" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+              <!-- 3. Turbine -->
+              <rect x="240" y="130" width="80" height="50" rx="6" fill="#1e1b4b" stroke="#7c3aed" stroke-width="2"/>
+              <text x="280" y="152" font-size="9" fill="#a78bfa" text-anchor="middle" font-weight="700">⚙️ 透平</text>
+              <text x="280" y="166" font-size="8" fill="#e8f4fd" text-anchor="middle">布雷顿循环</text>
+              <text x="280" y="178" font-size="7" fill="#8bacc8" text-anchor="middle">膨胀做功</text>
+
+              <!-- Arrow 3→4 -->
+              <line x1="320" y1="155" x2="345" y2="155" stroke="#d97706" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+              <!-- 4. Generator -->
+              <rect x="350" y="130" width="80" height="50" rx="6" fill="#1c3a5e" stroke="#3b82f6" stroke-width="2"/>
+              <text x="390" y="152" font-size="9" fill="#60a5fa" text-anchor="middle" font-weight="700">⚡ 发电机</text>
+              <text x="390" y="166" font-size="8" fill="#e8f4fd" text-anchor="middle">热→电</text>
+              <text x="390" y="178" font-size="7" fill="#8bacc8" text-anchor="middle">10-100kWe</text>
+
+              <!-- Return arrow from Generator → ACCU (bottom) -->
+              <path d="M350,190 L60,190 L60,130" stroke="#d97706" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
+              <text x="200" y="206" font-size="8" fill="#d97706" text-anchor="middle">CO₂工质循环</text>
+
+              <!-- Compressor in loop -->
+              <rect x="130" y="195" width="80" height="30" rx="4" fill="#292524" stroke="#d97706" stroke-width="1.5"/>
+              <text x="170" y="214" font-size="8" fill="#e8f4fd" text-anchor="middle">🔄 压缩机</text>
+
+              <!-- Radiator (below) -->
+              <rect x="240" y="195" width="80" height="30" rx="4" fill="#1c1917" stroke="#4a6580" stroke-width="1.5"/>
+              <text x="280" y="214" font-size="8" fill="#8bacc8" text-anchor="middle">❄️ 辐射散热</text>
+              <text x="280" y="240" font-size="7" fill="#4a6580" text-anchor="middle">冷端 -50°C~-80°C</text>
+
+              <!-- Waste Heat branches -->
+              <!-- Hot waste → SOEC -->
+              <path d="M280,130 L280,90 L360,90" stroke="#22c55e" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrowhead-green)"/>
+              <rect x="360" y="70" width="70" height="40" rx="4" fill="#022c22" stroke="#22c55e" stroke-width="1.5"/>
+              <text x="395" y="87" font-size="8" fill="#22c55e" text-anchor="middle" font-weight="700">🫁 SOEC</text>
+              <text x="395" y="100" font-size="7" fill="#8bacc8" text-anchor="middle">高温电解制O₂</text>
+
+              <!-- Medium → Sabatier -->
+              <path d="M170,130 L170,70 L250,70" stroke="#22c55e" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrowhead-green)"/>
+              <rect x="250" y="50" width="80" height="40" rx="4" fill="#022c22" stroke="#22c55e" stroke-width="1.5"/>
+              <text x="290" y="67" font-size="8" fill="#22c55e" text-anchor="middle" font-weight="700">⚗️ Sabatier</text>
+              <text x="290" y="80" font-size="7" fill="#8bacc8" text-anchor="middle">制CH₄推进剂</text>
+
+              <!-- Low temp → Base heating -->
+              <rect x="155" y="255" width="110" height="35" rx="4" fill="#022c22" stroke="#22c55e" stroke-width="1.5"/>
+              <text x="210" y="273" font-size="8" fill="#22c55e" text-anchor="middle" font-weight="700">🏠 基地供热</text>
+              <text x="210" y="285" font-size="7" fill="#8bacc8" text-anchor="middle">补偿-63°C环境</text>
+
+              <!-- CO2 label -->
+              <text x="60" y="120" font-size="8" fill="#fbbf24" text-anchor="middle">CO₂ 95%+</text>
+              <text x="60" y="114" font-size="7" fill="#4a6580" text-anchor="middle">(火星大气)</text>
+
+              <!-- Title -->
+              <text x="220" y="30" font-size="10" fill="#fbbf24" text-anchor="middle" font-weight="800" letter-spacing="1">IGTS 系统流程 · CO₂布雷顿循环</text>
+              <text x="220" y="46" font-size="8" fill="#4a6580" text-anchor="middle">中科大(USTC)亚临界气体循环研究</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- MOXIE Box -->
+        <div class="moxie-box fade-section">
+          <h4>📊 MOXIE验证 → 工程化推算（SpaceX推进剂工厂场景）</h4>
+          <div class="moxie-stats">
+            <div class="moxie-stat">
+              <div class="moxie-stat-val">12</div>
+              <div class="moxie-stat-label">g/h MOXIE峰值</div>
+            </div>
+            <div class="moxie-stat">
+              <div class="moxie-stat-val">>98</div>
+              <div class="moxie-stat-label">% O₂纯度</div>
+            </div>
+            <div class="moxie-stat">
+              <div class="moxie-stat-val">800</div>
+              <div class="moxie-stat-label">°C 工作温度</div>
+            </div>
+            <div class="moxie-stat">
+              <div class="moxie-stat-val">300</div>
+              <div class="moxie-stat-label">Wh/g O₂ 能耗</div>
+            </div>
+            <div class="moxie-stat">
+              <div class="moxie-stat-val">900</div>
+              <div class="moxie-stat-label">吨 单台LOX需求</div>
+            </div>
+            <div class="moxie-stat">
+              <div class="moxie-stat-val">~8300×</div>
+              <div class="moxie-stat-label">MOXIE→工厂规模</div>
+            </div>
+            <div class="moxie-stat">
+              <div class="moxie-stat-val">100kWe-2MWe</div>
+              <div class="moxie-stat-label">L3能源需求</div>
+            </div>
+          </div>
+          <p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6;">NASA毅力号MOXIE（2021-2024）已验证固体氧化物电解（SOEC）技术路径。工程化规模推算：单台Starship需约900吨液氧，年产900吨O₂对应制氧速率~100 kg/h，相当于MOXIE的~8,300倍，对应L3级100 kWe~2 MWe能源规模需求。</p>
+        </div>
+      </div>
+
+      <!-- TRACK C: SOLAR PV -->
+      <div class="track-section track-c">
+        <div class="track-header">
+          <div class="track-icon">☀️</div>
+          <div class="track-title">
+            <span class="track-label">Track C</span>
+            <h3>太阳能光伏 Solar Photovoltaic</h3>
+            <p class="zh-sub">弹性补充电源 · EDS主动除尘 · 尘暴监测与智能调度</p>
+          </div>
+          <div class="track-status">
+            <span class="status-badge status-active"><span class="status-dot"></span> 已部署验证</span>
+            <span class="status-badge status-active"><span class="status-dot"></span> TRL 7-8</span>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-value">~590<span class="metric-unit"> W/m²</span></div>
+            <div class="metric-label">Solar Irradiance</div>
+            <div class="metric-zh">火星表面辐照度</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">43<span class="metric-unit">%</span></div>
+            <div class="metric-label">vs Earth</div>
+            <div class="metric-zh">相对地球辐照度</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">99<span class="metric-unit">%</span></div>
+            <div class="metric-label">Dust Storm Max</div>
+            <div class="metric-zh">尘暴最大衰减</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">5-20<span class="metric-unit"> kWe</span></div>
+            <div class="metric-label">Power Output</div>
+            <div class="metric-zh">功率输出范围</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">30<span class="metric-unit">%</span></div>
+            <div class="metric-label">Cell Efficiency</div>
+            <div class="metric-zh">三结GaAs效率</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">0.85<span class="metric-unit"></span></div>
+            <div class="metric-label">EDS Dust Factor</div>
+            <div class="metric-zh">主动除尘后功率因子</div>
+          </div>
+        </div>
+
+        <div class="track-content-grid">
+          <div class="track-text">
+            <h4>火星光伏面临的三大工程挑战</h4>
+            <p><strong>挑战① 辐照度衰减：</strong>火星表面平均太阳辐照度约492~586 W/m²，仅为地球的43%。大气衰减（瑞利散射+气溶胶）进一步将有效辐照度降至约450~580 W/m²。</p>
+            <p><strong>挑战② 全球尘暴遮蔽：</strong>2018年全球性尘暴（GDS）导致机遇号永久失联——太阳辐照度降至正常值的10%~30%。平均每3个火星年发生一次，设计的能源系统必须在此期间由FSP基荷保障。</p>
+            <p><strong>挑战③ 尘埃积累：</strong>微米级火星尘粒覆盖光伏板表面，若不主动清洁，数十个Sol内效率下降可达40%以上。</p>
+
+            <h4>功率输出工程计算</h4>
+            <div class="formula">P<sub>PV</sub> = A × G × η<sub>cell</sub> × η<sub>dust</sub> × η<sub>temp</sub><br/>
+= A × 560 × 0.30 × 0.85 × 0.85 ≈ <strong>121 W/m²</strong><br/>
+<br/>
+P<sub>PV,storm</sub> ≈ 24 W/m²（尘暴期间，辐照度降至20%）</div>
+            <p>EDS静电动力尘埃屏可将光伏板表面尘埃去除效率维持95%以上，使η<sub>dust</sub>≈0.85。相比无除尘措施（η<sub>dust</sub>≈0.4-0.6），功率输出提升约40%。</p>
+          </div>
+
+          <div>
+            <div class="compare-grid">
+              <div class="compare-card">
+                <h5>Dust Removal Tech Comparison</h5>
+                <table>
+                  <tr><td class="ck">EDS静电屏</td><td class="cv ca">★★★★★</td></tr>
+                  <tr><td class="ck">CO₂喷吹</td><td class="cv">★★★</td></tr>
+                  <tr><td class="ck">机械刷</td><td class="cv">★★</td></tr>
+                  <tr><td class="ck">超声波振动</td><td class="cv">★★</td></tr>
+                  <tr><td class="ck">无除尘（基线）</td><td class="cv cb">★</td></tr>
+                </table>
+                <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.5rem;">推荐：EDS，零移动部件，低功耗，与火星低气压兼容最佳</p>
+              </div>
+              <div class="compare-card">
+                <h5>Cell Technology Comparison</h5>
+                <table>
+                  <tr><td class="ck">三结GaAs</td><td class="cv">η=30%</td><td class="ca">推荐</td></tr>
+                  <tr><td class="ck">多晶硅</td><td class="cv">η=18-22%</td><td></td></tr>
+                  <tr><td class="ck">单晶硅</td><td class="cv">η=24-26%</td><td></td></tr>
+                  <tr><td class="ck">钙钛矿</td><td class="cv">η=25-33%</td><td class="ca">研发中</td></tr>
+                  <tr><td class="ck">聚光CPV</td><td class="cv">η=38%</td><td class="cb">需跟踪</td></tr>
+                </table>
+                <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.5rem;">火星低气压利于聚光但沙尘会磨损透镜，三结GaAs为最佳工程选择</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- STORAGE SECTION -->
+  <section id="storage" aria-labelledby="storage-title">
+    <div class="container">
+      <div class="storage-header fade-section">
+        <span class="section-tag">Storage Layer</span>
+        <h2 id="storage-title">
+          <span class="en">Three-Layer Energy Storage Architecture</span>
+          <span class="zh">三层储能架构 · 覆盖全时间尺度</span>
+        </h2>
+        <p style="color:var(--text-secondary);max-width:600px;margin:1rem auto 0;font-size:0.92rem;line-height:1.7;">火星基地必须应对昼夜循环（~12h）、沙尘暴遮蔽（数天至数月）、核反应堆停机维护（数小时）三种时间尺度的储能需求，对应三层架构设计。</p>
+      </div>
+
+      <div class="storage-tiers fade-section">
+        <div class="storage-tier tier-1">
+          <div class="tier-header">
+            <span class="tier-num">01</span>
+            <div>
+              <div class="tier-title-en">Mars Gas Battery</div>
+              <div class="tier-title-zh">火星气电池 · 电化学储能（短时高功率）</div>
+            </div>
+          </div>
+          <div class="tier-body">
+            <p>中国科大创新性提出的火星电池将火星大气（CO₂、N₂、Ar等）吸入作为主要活性气体，通过电化学反应释放/存储电能。活性物质取自环境，无需携带——这是真正的原位资源利用。</p>
+            <p>关键优势：<strong>0°C低温稳定工作</strong>，解决了传统锂电池在火星夜间（-80°C）失效的问题；大幅减轻电池系统整体重量。</p>
+          </div>
+          <div class="tier-specs">
+            <span class="tier-spec">TRL 3-4</span>
+            <span class="tier-spec">0°C稳定工作</span>
+            <span class="tier-spec">原位CO₂活性</span>
+            <span class="tier-spec">高功率密度</span>
+            <span class="tier-spec">充放循环</span>
+          </div>
+        </div>
+
+        <div class="storage-tier tier-2">
+          <div class="tier-header">
+            <span class="tier-num">02</span>
+            <div>
+              <div class="tier-title-en">PCM Thermal Storage</div>
+              <div class="tier-title-zh">相变材料热储能 · 中等时长缓冲</div>
+            </div>
+          </div>
+          <div class="tier-body">
+            <p>相变材料（PCM）在凝固/熔化过程中吸收/释放大量潜热（凝固热），实现跨昼夜的物理热能缓冲。推荐材料：NaNO₂（亚硝酸钠），熔点271°C，潜热230 kJ/kg。</p>
+            <p>工程设计：覆盖12h夜间基地供热需求（约5 kWt×12h=216 MJ），对应理论最小质量约940 kg。与IGTS低温余热段耦合，实现热量零浪费。</p>
+          </div>
+          <div class="tier-specs">
+            <span class="tier-spec">NaNO₂ · 271°C</span>
+            <span class="tier-spec">230 kJ/kg潜热</span>
+            <span class="tier-spec">~940 kg（理论）</span>
+            <span class="tier-spec">IGTS余热耦合</span>
+          </div>
+        </div>
+
+        <div class="storage-tier tier-3">
+          <div class="tier-header">
+            <span class="tier-num">03</span>
+            <div>
+              <div class="tier-title-en">Flywheel FES</div>
+              <div class="tier-title-zh">飞轮储能 · 毫秒级功率调节</div>
+            </div>
+          </div>
+          <div class="tier-body">
+            <p>用于平滑电网频率波动、提供瞬时大功率输出（如机器人启动、焊接制造）。真空磁悬浮轴承（转速~60,000 rpm）使风阻损耗几乎为零。</p>
+            <p>在火星低气压（≈真空）环境下效率极高：功率密度约5 kW/kg，远优于化学电池的瞬时功率响应；自放电率极低，可维持旋转数小时以上。</p>
+          </div>
+          <div class="tier-specs">
+            <span class="tier-spec">真空磁悬浮</span>
+            <span class="tier-spec">~60,000 rpm</span>
+            <span class="tier-spec">5 kW/kg密度</span>
+            <span class="tier-spec">毫秒级响应</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- PMAD SECTION -->
+  <section id="pmad" aria-labelledby="pmad-title">
+    <div class="container">
+      <div class="pmad-header fade-section">
+        <span class="section-tag">Power Management</span>
+        <h2 id="pmad-title">
+          <span class="en">Power Management & Distribution (PMAD)</span>
+          <span class="zh">电力管理与分配系统 · 高压直流微电网架构</span>
+        </h2>
+      </div>
+
+      <div class="pmad-grid fade-section">
+        <div class="pmad-text">
+          <h4>为何选择HVDC微电网</h4>
+          <p>高压直流（HVDC）微电网是火星能源分配的最优架构，理由基于以下第一性原理判断：</p>
+          <p>• 火星无大气层对流，无交流电机主要应用场景（对流风机等）</p>
+          <p>• 光伏输出、电池充放电、裂变电源接口均为直流，AC/DC变换环节越少越好</p>
+          <p>• 高压（~1000V DC）传输可将长距离（50m反应堆至基地）线路质量降低约75%</p>
+          <p>• DC系统保护简单，无过零问题，更适合火星自主控制需求</p>
+          <div class="thermal-calc">
+            <h5>HVDC vs HVAC 传输效率对比</h5>
+            <p>50m距离，1MW传输：</p>
+            <p>220V AC：I=4550A，损耗≈2.1%</p>
+            <p>1000V DC：I=1000A，损耗≈0.05%</p>
+            <p class="result">→ 直流传输线损降低约97%</p>
+          </div>
+        </div>
+        <div class="priority-stack">
+          <h4 style="font-size:0.9rem;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--space-border);">功率调度优先级层级</h4>
+          <div class="priority-item">
+            <span class="priority-level p0">P0</span>
+            <span class="priority-desc">L0生存级负载（永不中断）<br/>通信/计算/热防护/辐射屏蔽</span>
+            <span class="priority-power">2-5 kWe</span>
+          </div>
+          <div class="priority-item">
+            <span class="priority-level p1">P1</span>
+            <span class="priority-desc">L1运行级负载（正常供给）<br/>科学仪器/机器人操作</span>
+            <span class="priority-power">10-20 kWe</span>
+          </div>
+          <div class="priority-item">
+            <span class="priority-level p2">P2</span>
+            <span class="priority-desc">储能充电（利用发电富余）<br/>自动调度策略</span>
+            <span class="priority-power">可中断</span>
+          </div>
+          <div class="priority-item">
+            <span class="priority-level p3">P3</span>
+            <span class="priority-desc">L2扩展负载（有余量时投入）<br/>ISRU制氧/3D打印建造</span>
+            <span class="priority-power">40-100 kWe</span>
+          </div>
+          <div class="priority-item">
+            <span class="priority-level p4">P4</span>
+            <span class="priority-desc">L3规模化负载（满发容量时运行）<br/>推进剂工厂 · Starship补给</span>
+            <span class="priority-power">1-2 MWe</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- THERMAL MANAGEMENT -->
+  <section id="thermal" aria-labelledby="thermal-title">
+    <div class="container">
+      <div class="thermal-header fade-section">
+        <span class="section-tag">Thermal Management</span>
+        <h2 id="thermal-title">
+          <span class="en">Thermal Management System</span>
+          <span class="zh">热管理系统 · 火星散热的工程难点</span>
+        </h2>
+      </div>
+
+      <div class="thermal-grid fade-section">
+        <div class="thermal-text">
+          <h4>核心挑战：对流散热完全失效</h4>
+          <p>火星大气密度仅为地球的1.6%，导致对流换热系数 <strong>h<sub>conv,Mars</sub> &lt; 2 W/m²K</strong>。对流散热几乎完全失效，所有热管理必须依赖<strong>辐射换热</strong>和<strong>热管导热</strong>。</p>
+          <p>这意味着40 kWe核裂变系统（效率25%）需要排热约120 kWt，辐射散热面积将成为本模块最具挑战性的工程参数。</p>
+
+          <div class="thermal-calc">
+            <h5>辐射散热器面积计算（斯蒂芬-玻尔兹曼定律）</h5>
+            <p>Q<sub>rad</sub> = ε·σ·A<sub>rad</sub>·(T<sub>rad</sub><sup>4</sup> - T<sub>sink</sub><sup>4</sup>)</p>
+            <p>冷端温度 T<sub>rad</sub> = 200K (-73°C)</p>
+            <p>火星背景 T<sub>sink</sub> = 210K</p>
+            <p>发射率 ε = 0.90（黑色涂层）</p>
+            <p class="result">A<sub>rad</sub> ≈ 380 m²（单台40kWe FSP）</p>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.5rem;">必须采用可展开折叠辐射翼结构（参考展开面积设计）</p>
+          </div>
+        </div>
+
+        <div class="thermal-text">
+          <h4>热管网络设计</h4>
+          <p>在基地结构内部，利用热管实现高效导热，替代地球上的对流风机散热方案：</p>
+          <p>• <strong>工质选择：</strong>氨（NH₃），工作温度 -78°C ~ +100°C，符合火星热环境</p>
+          <p>• <strong>传热能力：</strong>单根轴向热管 &gt;5 kW/m（远优于铝合金~0.1 kW/m）</p>
+          <p>• <strong>集成设计：</strong>与结构模块一体化，兼顾导热和结构支撑功能</p>
+
+          <h4>热管理系统关键指标</h4>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr><th>参数</th><th>数值</th><th>说明</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="td-key">对流换热系数</td><td class="td-val">&lt;2 W/m²K</td><td class="td-note">火星大气密度极低</td></tr>
+                <tr><td class="td-key">辐射翼面积</td><td class="td-val">400-1200 m²</td><td class="td-note">40kWe FSP排热需求</td></tr>
+                <tr><td class="td-key">热管传热</td><td class="td-val">&gt;5 kW/m</td><td class="td-note">氨工质轴向热管</td></tr>
+                <tr><td class="td-key">散热器发射率</td><td class="td-val">ε=0.90</td><td class="td-note">高发射率黑色涂层</td></tr>
+                <tr><td class="td-key">结构集成</td><td class="td-val">一体化</td><td class="td-note">热管+结构+屏蔽三合一</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- PHASE ROADMAP -->
+  <section id="roadmap" aria-labelledby="roadmap-title">
+    <div class="container">
+      <div class="roadmap-header fade-section">
+        <span class="section-tag">Development Roadmap</span>
+        <h2 id="roadmap-title">
+          <span class="en">Phase Deployment Roadmap</span>
+          <span class="zh">阶段部署路线图</span>
+        </h2>
+      </div>
+
+      <div class="phase-timeline fade-section">
+        <div class="phase-item">
+          <div class="phase-dot"></div>
+          <div class="phase-card">
+            <span class="phase-tag">Phase 0-1 · ~2030</span>
+            <h3 class="phase-title">Unmanned Automation · 无人自动化阶段</h3>
+            <p class="phase-zh">无人先遣与自动化建造</p>
+            <div class="phase-items">
+              <span class="phase-chip">2×10kWe核裂变FSP验证</span>
+              <span class="phase-chip">MarsLink组网</span>
+              <span class="phase-chip">ISRU原位资源验证</span>
+              <span class="phase-chip">火星气电池原型</span>
+            </div>
+            <div class="phase-power">目标：40kWe基线功率（NASA人类任务基线）</div>
+          </div>
+        </div>
+
+        <div class="phase-item">
+          <div class="phase-dot"></div>
+          <div class="phase-card">
+            <span class="phase-tag">Phase 2 · ~2035</span>
+            <h3 class="phase-title">Capped Mission · 短期有人驻留</h3>
+            <p class="phase-zh">首次载人任务与基地扩展</p>
+            <div class="phase-items">
+              <span class="phase-chip">4×10kWe FSP（40kWe基线）</span>
+              <span class="phase-chip">IGTS首台套部署</span>
+              <span class="phase-chip">MOXIE工程化版本</span>
+              <span class="phase-chip">O₂和CH₄储备建立</span>
+            </div>
+            <div class="phase-power">目标：100kWe+级，三轨并行全面运行</div>
+          </div>
+        </div>
+
+        <div class="phase-item">
+          <div class="phase-dot"></div>
+          <div class="phase-card">
+            <span class="phase-tag">Phase 3 · ~2040</span>
+            <h3 class="phase-title">Permanent Outpost · 永久前哨站</h3>
+            <p class="phase-zh">连续驻留与规模化运营</p>
+            <div class="phase-items">
+              <span class="phase-chip">MWe级核裂变集群</span>
+              <span class="phase-chip">IGTS阵列化部署</span>
+              <span class="phase-chip">MIES综合能源集成</span>
+              <span class="phase-chip">推进剂工厂全速生产</span>
+            </div>
+            <div class="phase-power">目标：2MWe规模，支撑Starship推进剂补给</div>
+          </div>
+        </div>
+
+        <div class="phase-item">
+          <div class="phase-dot"></div>
+          <div class="phase-card">
+            <span class="phase-tag">Phase 4 · 远期</span>
+            <h3 class="phase-title">Settlement · 定居点</h3>
+            <p class="phase-zh">百人规模永久定居</p>
+            <div class="phase-items">
+              <span class="phase-chip">多基地互联能源网络</span>
+              <span class="phase-chip">本地制造全周期支撑</span>
+              <span class="phase-chip">农业闭环能源保障</span>
+              <span class="phase-chip">经济自持</span>
+            </div>
+            <div class="phase-power">目标：10MWe+级，多基地能源生态</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- SUMMARY TABLE -->
+  <section id="summary" aria-labelledby="summary-title">
+    <div class="container">
+      <div class="summary-header fade-section">
+        <span class="section-tag">Engineering Summary</span>
+        <h2 id="summary-title">
+          <span class="en">Engineering Parameters Summary</span>
+          <span class="zh">工程参数综合对比表</span>
+        </h2>
+      </div>
+
+      <div class="summary-table-wrap fade-section">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>技术路线</th>
+              <th>功率范围</th>
+              <th>TRL</th>
+              <th>ISRU程度</th>
+              <th>独立于太阳</th>
+              <th>主要约束</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">核裂变FSP（基荷主力）</td>
+              <td class="td-power">40kWe/台</td>
+              <td class="td-trl trl-high">6/9</td>
+              <td>无（需运输铀燃料）</td>
+              <td class="ca">✓ 完全独立</td>
+              <td>辐射安全、审批复杂</td>
+            </tr>
+            <tr>
+              <td class="td-name">原位气体热电IGTS（ISRU）</td>
+              <td class="td-power">10-100kWe</td>
+              <td class="td-trl trl-mid">3-4/9</td>
+              <td class="ca">✓✓ 完全ISRU</td>
+              <td class="ca">✓ 热源依赖</td>
+              <td>TRL低，需工程化验证</td>
+            </tr>
+            <tr>
+              <td class="td-name">太阳能光伏（弹性补充）</td>
+              <td class="td-power">5-20kWe</td>
+              <td class="td-trl trl-high">7-8/9</td>
+              <td>部分（需运输电池板）</td>
+              <td class="cb">✗ 尘暴遮蔽</td>
+              <td>尘暴、尘埃积累、辐照度低</td>
+            </tr>
+            <tr>
+              <td class="td-name">火星气电池（储能S1）</td>
+              <td class="td-power">短时高功率</td>
+              <td class="td-trl trl-mid">3-4/9</td>
+              <td class="ca">✓✓ 完全ISRU</td>
+              <td>—</td>
+              <td>0°C低温稳定性已验证</td>
+            </tr>
+            <tr>
+              <td class="td-name">PCM相变储热（储能S2）</td>
+              <td class="td-power">~216MJ/夜</td>
+              <td class="td-trl trl-high">6/9</td>
+              <td>部分</td>
+              <td>—</td>
+              <td>NaNO₂，热-电-氧耦合</td>
+            </tr>
+            <tr>
+              <td class="td-name">飞轮储能（储能S3）</td>
+              <td class="td-power">毫秒级调节</td>
+              <td class="td-trl trl-high">7/9</td>
+              <td>无（需运输）</td>
+              <td>—</td>
+              <td>真空磁悬浮（TRL7已有先例）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="intro-text fade-section" style="margin-top:3rem;max-width:900px;margin-left:auto;margin-right:auto;text-align:center;">
+        <h2 style="font-size:1.4rem;"><span>本节结语</span></h2>
+        <p style="margin-top:1rem;">火星能源供应模块的工程核心是"不依赖任何单一技术，在火星物理约束边界内构建多冗余、自演进的能源生态"。核裂变提供基荷保障，原位气体热电转化实现资源自持，光伏系统提供弹性补充，三层储能覆盖全时间尺度需求，PMAD智能调度保障全系统协同——这六个子系统共同构成一个在火星极端环境下能够长期自主运行的完整能源体系。</p>
+        <p style="margin-top:0.8rem;font-size:0.82rem;color:var(--text-muted);">注：火星气电池、IGTS系统参数基于中国科学技术大学最新实验数据，TRL等级为3-4，仍需工程化验证；核裂变FSP参数基于NASA/DOE公开基线设计文档。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer role="contentinfo">
+    <p>
+      <strong>Mars Base Alpha</strong> · 火星基地阿尔法<br />
+      <span style="font-size:0.78rem;">Section 3.1 · Energy Supply Module · 三轨并行发电架构详细设计</span>
+    </p>
+    <p style="margin-top:0.5rem;">
+      <a href="index.html">返回首页</a> ·
+      <a href="https://github.com/eugenewang126-afk/eugene-WANG">GitHub</a> ·
+      <span style="color:var(--text-muted);">基于第一性原理 · 2026</span>
+    </p>
+  </footer>
+
+  <!-- Scroll Animation -->
+  <script>
+    (function() {
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.fade-section').forEach(function(el) {
+        observer.observe(el);
+      });
+    })();
+  </script>
+</body>
+</html>
