@@ -1,0 +1,1559 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>辅助系统及互联网络 · Auxiliary Systems & Network | 火星基地阿尔法</title>
+  <meta name="description" content="四层自治金字塔架构：执行层→协调层→规划层→决策层，实现3-22分钟通信时延下的完全自主运行。" />
+  <meta name="theme-color" content="#22c55e" />
+  <style>
+    :root {
+      --mars-red:#c1440e;--mars-orange:#e8621a;--mars-amber:#f4a234;--mars-dust:#d4956a;
+      --space-black:#03050a;--space-deep:#070d1a;--space-mid:#0d1b2e;--space-panel:#111c2e;
+      --space-card:#162235;--space-border:#1e3050;--space-hover:#1a2d48;
+      --text-primary:#e8f4fd;--text-secondary:#8bacc8;--text-muted:#4a6580;--text-accent:#f4a234;
+      --glow-red:rgba(193,68,14,0.35);--glow-amber:rgba(244,162,52,0.25);--glow-blue:rgba(56,139,230,0.20);
+      --aux-green:#22c55e;--aux-teal:#14b8a6;--aux-emerald:#059669;
+      --green-ok:#22c55e;--yellow-warn:#eab308;--purple:#a855f7;
+      --font-en:'Segoe UI','Helvetica Neue',Arial,sans-serif;
+      --font-zh:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+      --radius-sm:6px;--radius-md:12px;--radius-lg:20px;--radius-xl:32px;
+      --shadow-card:0 4px 32px rgba(0,0,0,0.5);
+      --transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;font-size:16px;}
+    body{background:var(--space-black);color:var(--text-primary);font-family:var(--font-zh);line-height:1.7;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 25%,rgba(34,197,94,0.08) 0%,transparent 50%),radial-gradient(ellipse at 85% 75%,rgba(20,184,166,0.06) 0%,transparent 50%);pointer-events:none;z-index:0;}
+    ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--space-deep);}::-webkit-scrollbar-thumb{background:var(--aux-green);border-radius:3px;}
+
+    /* NAV */
+    #navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(3,5,10,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--space-border);height:64px;display:flex;align-items:center;padding:0 2rem;gap:1rem;}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+    .nav-logo-icon{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#22c55e,#16a34a 50%,#14532d);box-shadow:0 0 16px rgba(34,197,94,0.3);position:relative;overflow:hidden;flex-shrink:0;}
+    .nav-logo-icon::after{content:'';position:absolute;top:18%;left:20%;width:40%;height:15%;background:rgba(255,255,255,0.12);border-radius:50%;transform:rotate(-30deg);}
+    .nav-logo-text{display:flex;flex-direction:column;line-height:1.2;}
+    .nav-logo-en{font-size:0.78rem;font-family:var(--font-en);font-weight:700;letter-spacing:0.12em;color:var(--aux-teal);text-transform:uppercase;}
+    .nav-logo-zh{font-size:0.72rem;color:var(--text-secondary);letter-spacing:0.05em;}
+    .nav-links{display:flex;align-items:center;gap:0.2rem;margin-left:1.5rem;flex:1;}
+    .nav-link{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius-sm);text-decoration:none;font-size:0.82rem;color:var(--text-secondary);transition:var(--transition);white-space:nowrap;letter-spacing:0.02em;}
+    .nav-link:hover,.nav-link.active{color:var(--text-primary);background:var(--space-hover);}
+    .nav-link.active{color:var(--aux-teal);}
+    .nav-right{display:flex;align-items:center;gap:0.75rem;margin-left:auto;flex-shrink:0;}
+    .lang-toggle{display:flex;background:var(--space-panel);border:1px solid var(--space-border);border-radius:20px;overflow:hidden;padding:2px;}
+    .lang-btn{padding:4px 14px;border:none;background:transparent;color:var(--text-secondary);font-size:0.78rem;font-weight:600;cursor:pointer;border-radius:16px;transition:var(--transition);letter-spacing:0.05em;}
+    .lang-btn.active{background:var(--aux-green);color:white;}
+    .btn-back{display:flex;align-items:center;gap:6px;padding:6px 16px;background:transparent;border:1px solid var(--space-border);border-radius:var(--radius-sm);color:var(--text-secondary);font-size:0.82rem;cursor:pointer;text-decoration:none;transition:var(--transition);}
+    .btn-back:hover{border-color:var(--aux-green);color:var(--aux-teal);background:var(--space-hover);}
+
+    /* HERO */
+    #hero{position:relative;min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 2rem 3rem;z-index:1;overflow:hidden;}
+    .hero-bg{position:absolute;inset:0;z-index:0;overflow:hidden;}
+    .hero-planet{position:absolute;bottom:-200px;right:-150px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#14b8a6 0%,#22c55e 25%,#16a34a 50%,#14532d 72%,#052e16 90%,#03050a 100%);opacity:0.12;animation:marsRotate 180s linear infinite;pointer-events:none;}
+    @keyframes marsRotate{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+    .hero-content{position:relative;z-index:1;max-width:900px;}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:5px 18px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35);border-radius:30px;font-size:0.73rem;letter-spacing:0.15em;color:#22c55e;text-transform:uppercase;font-family:var(--font-en);font-weight:700;margin-bottom:1.5rem;}
+    .hero-badge-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse-green 1.5s infinite;}
+    @keyframes pulse-green{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.6);}50%{box-shadow:0 0 0 6px rgba(34,197,94,0);}}
+    .hero-title{font-size:clamp(2rem,5vw,4rem);font-weight:800;line-height:1.1;letter-spacing:-0.02em;margin-bottom:1rem;}
+    .hero-title-en{display:block;background:linear-gradient(135deg,#14b8a6 0%,#22c55e 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:var(--font-en);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;}
+    .hero-title-zh{display:block;color:var(--text-primary);font-size:0.5em;font-weight:300;letter-spacing:0.25em;}
+    .hero-subtitle{max-width:750px;margin:0 auto 2rem;font-size:1rem;color:var(--text-secondary);line-height:1.8;}
+    .hero-stats{display:flex;gap:2px;background:var(--space-panel);border:1px solid var(--space-border);border-radius:var(--radius-lg);overflow:hidden;flex-wrap:wrap;justify-content:center;}
+    .stat-item{padding:16px 28px;text-align:center;border-right:1px solid var(--space-border);transition:var(--transition);}
+    .stat-item:last-child{border-right:none;}
+    .stat-item:hover{background:var(--space-hover);}
+    .stat-value{display:block;font-size:1.6rem;font-weight:800;font-family:var(--font-en);background:linear-gradient(135deg,#14b8a6,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;}
+    .stat-label{font-size:0.72rem;color:var(--text-secondary);letter-spacing:0.08em;margin-top:4px;}
+
+    /* CONTAINER & SECTION */
+    .container{max-width:1280px;margin:0 auto;padding:0 2rem;}
+    .section-divider{border:none;height:1px;background:linear-gradient(90deg,transparent,var(--space-border),transparent);margin:4rem 0;}
+    .section-header{text-align:center;margin-bottom:3rem;}
+    .section-tag{display:inline-block;padding:4px 16px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);border-radius:20px;font-size:0.7rem;font-family:var(--font-en);font-weight:700;letter-spacing:0.2em;color:var(--aux-green);text-transform:uppercase;margin-bottom:1rem;}
+    .section-header h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.2;}
+    .section-header h2 .en{display:block;font-family:var(--font-en);letter-spacing:-0.01em;}
+    .section-header h2 .zh{display:block;font-size:0.55em;font-weight:300;color:var(--text-secondary);letter-spacing:0.2em;margin-top:0.3rem;}
+    .section-header p{color:var(--text-secondary);font-size:0.92rem;max-width:600px;margin:1rem auto 0;line-height:1.7;}
+
+    /* DATA TABLE */
+    .data-table-wrap{overflow-x:auto;margin:1.5rem 0;border:1px solid var(--space-border);border-radius:var(--radius-md);}
+    .data-table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+    .data-table th{background:var(--space-panel);color:var(--text-secondary);font-family:var(--font-en);font-weight:700;font-size:0.68rem;letter-spacing:0.08em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--space-border);text-transform:uppercase;white-space:nowrap;}
+    .data-table td{padding:8px 14px;border-bottom:1px solid rgba(30,48,80,0.5);color:var(--text-secondary);vertical-align:middle;line-height:1.5;}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:hover td{background:var(--space-hover);}
+    .data-table .td-val{color:var(--aux-teal);font-family:var(--font-en);font-weight:600;white-space:nowrap;}
+    .data-table .td-highlight{color:var(--text-primary);font-weight:600;}
+    .data-table .td-check{color:#22c55e;font-weight:700;}
+    .data-table .td-warn{color:#eab308;font-weight:600;}
+
+    /* CARDS & GRIDS */
+    .card-grid{display:grid;gap:1.5rem;margin-bottom:2rem;}
+    .card-grid-2{grid-template-columns:1fr 1fr;}
+    .card-grid-3{grid-template-columns:repeat(3,1fr);}
+    .card-grid-4{grid-template-columns:repeat(4,1fr);}
+    .card{background:var(--space-card);border:1px solid var(--space-border);border-radius:var(--radius-lg);padding:1.5rem;transition:var(--transition);position:relative;overflow:hidden;}
+    .card:hover{border-color:var(--aux-green);transform:translateY(-4px);box-shadow:0 8px 32px rgba(34,197,94,0.15);}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;width:100%;}
+    .card-green::before{background:linear-gradient(90deg,#22c55e,#14b8a6);}
+    .card-teal::before{background:linear-gradient(90deg,#14b8a6,#06b6d4);}
+    .card-emerald::before{background:linear-gradient(90deg,#059669,#22c55e);}
+    .card-amber::before{background:linear-gradient(90deg,#f4a234,#e8621a);}
+    .card-red::before{background:linear-gradient(90deg,#ef4444,#dc2626);}
+    .card-purple::before{background:linear-gradient(90deg,#a855f7,#7c3aed);}
+    .card-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:1rem;}
+    .card-icon{width:48px;height:48px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+    .card-icon-green{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.25);}
+    .card-icon-teal{background:rgba(20,184,166,0.12);border:1px solid rgba(20,184,166,0.25);}
+    .card-icon-emerald{background:rgba(5,150,105,0.12);border:1px solid rgba(5,150,105,0.25);}
+    .card-icon-amber{background:rgba(244,162,52,0.12);border:1px solid rgba(244,162,52,0.25);}
+    .card-icon-red{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);}
+    .card-icon-purple{background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.25);}
+    .card-label{display:inline-block;font-size:0.62rem;font-family:var(--font-en);font-weight:700;letter-spacing:0.2em;padding:2px 8px;border-radius:10px;margin-bottom:0.4rem;text-transform:uppercase;}
+    .label-green{background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.25);}
+    .label-teal{background:rgba(20,184,166,0.12);color:#14b8a6;border:1px solid rgba(20,184,166,0.25);}
+    .label-emerald{background:rgba(5,150,105,0.12);color:#059669;border:1px solid rgba(5,150,105,0.25);}
+    .label-amber{background:rgba(244,162,52,0.12);color:#f4a234;border:1px solid rgba(244,162,52,0.25);}
+    .label-red{background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);}
+    .card h3{font-size:1.05rem;font-family:var(--font-en);font-weight:800;line-height:1.2;color:var(--text-primary);}
+    .card .zh-sub{font-size:0.78rem;color:var(--text-secondary);margin-top:2px;}
+    .card-body{font-size:0.82rem;color:var(--text-secondary);line-height:1.7;margin-bottom:0.8rem;}
+    .card-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;}
+    .metric{background:var(--space-panel);border-radius:var(--radius-sm);padding:0.6rem;text-align:center;}
+    .metric-val{font-size:1.1rem;font-weight:800;font-family:var(--font-en);color:var(--aux-teal);}
+    .metric-label{font-size:0.65rem;color:var(--text-muted);margin-top:2px;}
+
+    /* FORMULA */
+    .formula-box{background:var(--space-panel);border:1px solid var(--space-border);border-radius:var(--radius-sm);padding:1rem 1.2rem;margin:1rem 0;font-size:0.85rem;font-family:var(--font-en);color:var(--aux-teal);overflow-x:auto;line-height:1.8;}
+
+    /* DIAGRAM WRAP */
+    .diagram-wrap{background:var(--space-card);border:1px solid var(--space-border);border-radius:var(--radius-lg);padding:2rem;margin-bottom:2rem;overflow-x:auto;}
+    .diagram-svg{width:100%;display:block;}
+
+    /* TIMELINE */
+    .timeline{position:relative;padding-left:2.5rem;}
+    .timeline::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--aux-green),var(--aux-teal),var(--space-border));}
+    .timeline-item{position:relative;margin-bottom:2rem;}
+    .timeline-dot{position:absolute;left:-2.5rem;top:4px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;z-index:1;}
+    .dot-green{background:var(--aux-green);color:white;box-shadow:0 0 12px rgba(34,197,94,0.4);}
+    .dot-amber{background:var(--mars-amber);color:white;box-shadow:0 0 12px rgba(244,162,52,0.4);}
+    .dot-red{background:#ef4444;color:white;box-shadow:0 0 12px rgba(239,68,68,0.4);}
+    .timeline-time{font-size:0.78rem;font-family:var(--font-en);font-weight:700;color:var(--aux-green);margin-bottom:0.3rem;}
+    .timeline-content{background:var(--space-card);border:1px solid var(--space-border);border-radius:var(--radius-md);padding:1rem 1.2rem;}
+    .timeline-content h4{font-size:0.9rem;color:var(--text-primary);margin-bottom:0.5rem;}
+    .timeline-content p{font-size:0.8rem;color:var(--text-secondary);line-height:1.6;}
+
+    /* CODE / ALGO */
+    .code-block{background:var(--space-deep);border:1px solid var(--space-border);border-radius:var(--radius-md);padding:1rem 1.2rem;font-family:'Cascadia Code','Fira Code',monospace;font-size:0.75rem;line-height:1.6;color:var(--text-secondary);overflow-x:auto;white-space:pre-wrap;word-break:break-word;}
+    .code-keyword{color:#c084fc;} .code-func{color:#22c55e;} .code-str{color:#f4a234;} .code-comment{color:#4a6580;font-style:italic;}
+
+    /* DIALOGUE */
+    .dialogue-box{background:var(--space-card);border:1px solid var(--space-border);border-radius:var(--radius-lg);padding:1.5rem;margin:1rem 0;}
+    .dialogue-line{display:flex;gap:12px;margin-bottom:1rem;align-items:flex-start;}
+    .dialogue-line:last-child{margin-bottom:0;}
+    .dialogue-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+    .avatar-human{background:rgba(244,162,52,0.15);border:1px solid rgba(244,162,52,0.3);}
+    .avatar-ai{background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);}
+    .dialogue-text{flex:1;font-size:0.82rem;color:var(--text-secondary);line-height:1.6;padding:8px 12px;background:var(--space-panel);border-radius:var(--radius-sm);}
+    .dialogue-text .speaker{font-weight:700;color:var(--text-primary);display:block;margin-bottom:4px;font-size:0.75rem;}
+
+    /* FADE ANIMATION */
+    .fade-section{opacity:0;transform:translateY(30px);transition:opacity 0.8s ease,transform 0.8s ease;}
+    .fade-section.visible{opacity:1;transform:translateY(0);}
+
+    /* FOOTER */
+    #footer{padding:3rem 0;border-top:1px solid var(--space-border);text-align:center;}
+    .footer-text{font-size:0.78rem;color:var(--text-muted);line-height:1.6;}
+
+    /* RESPONSIVE */
+    @media(max-width:1024px){.card-grid-2,.card-grid-3,.card-grid-4{grid-template-columns:1fr;}.intro-grid{grid-template-columns:1fr;}}
+    @media(max-width:768px){.hero-stats{flex-direction:column;}.stat-item{border-right:none;border-bottom:1px solid var(--space-border);}.stat-item:last-child{border-bottom:none;}#navbar{padding:0 1rem;}.nav-links{display:none;}.container{padding:0 1rem;}}
+  </style>
+<style>
+html.lang-en .zh { display: none !important; }
+html.lang-en .en { display: inline !important; }
+html.lang-zh .en { display: none !important; }
+html.lang-zh .zh { display: inline !important; }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon"></div>
+    <div class="nav-logo-text">
+      <span class="nav-logo-en">Mars Base Alpha</span>
+      <span class="nav-logo-zh">火星基地阿尔法</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="energy.html" class="nav-link">⚡ 能源供应</a>
+    <a href="communication.html" class="nav-link">📡 通信系统</a>
+    <a href="materials.html" class="nav-link">🏗️ 材料结构</a>
+    <a href="auxiliary.html" class="nav-link active">🔗 辅助系统</a>
+  </div>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="zh">中文</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <a href="index.html" class="btn-back">← 返回首页</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"><div class="hero-planet"></div></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="hero-badge-dot"></span> Section 3.4 · Auxiliary Systems &amp; Network</div>
+    <h1 class="hero-title">
+      <span class="hero-title-en" data-i18n-orig="Auxiliary Systems &amp; Network">Auxiliary Systems &amp; Network</span>
+      <span class="hero-title-zh" data-i18n-orig="辅助系统及互联网络 · 四层自治金字塔架构">辅助系统及互联网络 · 四层自治金字塔架构</span>
+    </h1>
+    <p class="hero-subtitle" data-i18n-orig="火星基地辅助系统的工程本质，不是地球工业互联网的简单移植，而是在通信时延3～22分钟、无GPS基础设施、GCR辐射持续轰击、能源极度有限四重边界下，构建一套能够完全自主感知、自主决策、自主执行的闭环智能系统。每一个传感器的选型、每一段网络的协议栈、每一台机器人的控制逻辑，都必须以\u2018地球完全失联14天，系统仍能完美运行\u2019为最低设计标准。">火星基地辅助系统的工程本质，不是地球工业互联网的简单移植，而是在通信时延3～22分钟、无GPS基础设施、GCR辐射持续轰击、能源极度有限四重边界下，构建一套能够完全自主感知、自主决策、自主执行的闭环智能系统。每一个传感器的选型、每一段网络的协议栈、每一台机器人的控制逻辑，都必须以\u2018地球完全失联14天，系统仍能完美运行\u2019为最低设计标准。</p>
+    <div class="hero-stats">
+      <div class="stat-item"><span class="stat-value">4</span><span class="stat-label">自治层级</span></div>
+      <div class="stat-item"><span class="stat-value">3-22min</span><span class="stat-label">通信时延</span></div>
+      <div class="stat-item"><span class="stat-value">10,000+</span><span class="stat-label">传感节点</span></div>
+      <div class="stat-item"><span class="stat-value">5</span><span class="stat-label">机器人类型</span></div>
+      <div class="stat-item"><span class="stat-value">30天</span><span class="stat-label">完全自治</span></div>
+    </div>
+  </div>
+</section>
+<!-- SECTION 2: Architecture Overview -->
+<section id="architecture" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">Architecture</span>
+    <h2><span class="en">Four-Layer Autonomous Pyramid</span><span class="zh">四层自治金字塔架构</span></h2>
+    <p data-i18n-orig="设计公理：单层失效→下层必须维持生存；双层失效→L1必须保证生命支持">设计公理：单层失效→下层必须维持生存；双层失效→L1必须保证生命支持</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <svg class="diagram-svg" viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg">
+      <!-- Pyramid layers -->
+      <defs>
+        <linearGradient id="gL4" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient>
+        <linearGradient id="gL3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+        <linearGradient id="gL2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient>
+        <linearGradient id="gL1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f4a234"/><stop offset="100%" stop-color="#e8621a"/></linearGradient>
+      </defs>
+      <!-- L4 - top -->
+      <polygon points="350,30 550,30 620,130 280,130" fill="url(#gL4)" opacity="0.85" rx="8"/>
+      <text x="450" y="70" text-anchor="middle" fill="white" font-size="14" font-weight="700" font-family="Segoe UI">L4 · Cross-Planetary</text>
+      <text x="450" y="90" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="11" font-family="Segoe UI">跨行星决策层 · 3-22min</text>
+      <text x="450" y="115" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="10" font-family="Segoe UI">DTN + Earth Expert System</text>
+      <!-- L3 -->
+      <polygon points="280,140 620,140 700,250 200,250" fill="url(#gL3)" opacity="0.85"/>
+      <text x="450" y="178" text-anchor="middle" fill="white" font-size="14" font-weight="700" font-family="Segoe UI">L3 · Base Autonomous</text>
+      <text x="450" y="198" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="11" font-family="Segoe UI">基地自主规划层 · &lt;10s</text>
+      <text x="450" y="230" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="10" font-family="Segoe UI">Digital Twin + LLM + MPC + RL</text>
+      <!-- L2 -->
+      <polygon points="200,260 700,260 790,370 110,370" fill="url(#gL2)" opacity="0.85"/>
+      <text x="450" y="298" text-anchor="middle" fill="white" font-size="14" font-weight="700" font-family="Segoe UI">L2 · Sub-system Coordination</text>
+      <text x="450" y="318" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="11" font-family="Segoe UI">子系统协调层 · &lt;1s</text>
+      <text x="450" y="350" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="10" font-family="Segoe UI">Sensor Fusion + Robot Coord + ISRU Scheduler</text>
+      <!-- L1 -->
+      <polygon points="110,380 790,380 880,490 20,490" fill="url(#gL1)" opacity="0.85"/>
+      <text x="450" y="418" text-anchor="middle" fill="white" font-size="14" font-weight="700" font-family="Segoe UI">L1 · Hard Real-time</text>
+      <text x="450" y="438" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="11" font-family="Segoe UI">硬实时执行层 · &lt;10ms</text>
+      <text x="450" y="470" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="10" font-family="Segoe UI">PLC/FPGA + Actuator Drive + Safety Interlock</text>
+      <!-- Arrows -->
+      <line x1="640" y1="80" x2="720" y2="80" stroke="#a855f7" stroke-width="2" marker-end="url(#arrowPurple)"/>
+      <line x1="720" y1="195" x2="640" y2="195" stroke="#14b8a6" stroke-width="2" marker-end="url(#arrowTeal)"/>
+      <line x1="710" y1="315" x2="640" y2="315" stroke="#22c55e" stroke-width="2" marker-end="url(#arrowGreen)"/>
+      <line x1="800" y1="435" x2="640" y2="435" stroke="#f4a234" stroke-width="2" marker-end="url(#arrowAmber)"/>
+      <!-- Side labels -->
+      <text x="740" y="84" fill="#a855f7" font-size="10" font-family="Segoe UI">Mission Planning</text>
+      <text x="740" y="199" fill="#14b8a6" font-size="10" font-family="Segoe UI">Emergency Response</text>
+      <text x="730" y="319" fill="#22c55e" font-size="10" font-family="Segoe UI">Multi-robot Task</text>
+      <text x="820" y="439" fill="#f4a234" font-size="10" font-family="Segoe UI">Life Support</text>
+      <!-- Defs for arrowheads -->
+      <defs>
+        <marker id="arrowPurple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#a855f7"/></marker>
+        <marker id="arrowTeal" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#14b8a6"/></marker>
+        <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#22c55e"/></marker>
+        <marker id="arrowAmber" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f4a234"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="card-grid card-grid-4">
+    <div class="card card-purple">
+      <div class="card-header"><div class="card-icon card-icon-purple">🛰️</div><div><span class="card-label label-green">L4</span><h3>Cross-Planetary</h3><div class="zh-sub">跨行星决策层</div></div></div>
+      <div class="card-body">地球专家系统通过DTN链路提供战略指导，3-22分钟单向时延。任务规划、科学优先级、资源分配策略。</div>
+      <div class="card-metrics"><div class="metric"><div class="metric-val">3-22min</div><div class="metric-label">响应时延</div></div><div class="metric"><div class="metric-val">DTN</div><div class="metric-label">协议栈</div></div></div>
+    </div>
+    <div class="card card-teal">
+      <div class="card-header"><div class="card-icon card-icon-teal">🧠</div><div><span class="card-label label-teal">L3</span><h3>Base Autonomous</h3><div class="zh-sub">基地自主规划层</div></div></div>
+      <div class="card-body">数字孪生+LLM推理引擎，应急响应&lt;10s。在地球失联期间独立完成全部决策，包括尘暴应对、设备故障诊断。</div>
+      <div class="card-metrics"><div class="metric"><div class="metric-val">&lt;10s</div><div class="metric-label">响应时延</div></div><div class="metric"><div class="metric-val">DT+LLM</div><div class="metric-label">技术栈</div></div></div>
+    </div>
+    <div class="card card-green">
+      <div class="card-header"><div class="card-icon card-icon-green">🤖</div><div><span class="card-label label-green">L2</span><h3>Sub-system Coord</h3><div class="zh-sub">子系统协调层</div></div></div>
+      <div class="card-body">传感器融合、机器人任务调度、ISRU产线管理。多机器人协作采用去中心化拍卖算法，&lt;1s完成重分配。</div>
+      <div class="card-metrics"><div class="metric"><div class="metric-val">&lt;1s</div><div class="metric-label">响应时延</div></div><div class="metric"><div class="metric-val">TSN</div><div class="metric-label">网络</div></div></div>
+    </div>
+    <div class="card card-amber">
+      <div class="card-header"><div class="card-icon card-icon-amber">⚙️</div><div><span class="card-label label-amber">L1</span><h3>Hard Real-time</h3><div class="zh-sub">硬实时执行层</div></div></div>
+      <div class="card-body">PLC/FPGA直接驱动执行器，安全联锁&lt;10ms。ECLSS阀门控制、压力释放、火灾抑制——不可延迟的生命保障。</div>
+      <div class="card-metrics"><div class="metric"><div class="metric-val">&lt;10ms</div><div class="metric-label">响应时延</div></div><div class="metric"><div class="metric-val">FPGA</div><div class="metric-label">硬件</div></div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- SECTION 3: Environment Monitoring Network -->
+<section id="emn" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">EMN</span>
+    <h2><span class="en">Environment Monitoring Network</span><span class="zh">环境监测网络</span></h2>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem;">A. MEDA 工程基线 / MEDA Engineering Baseline</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>传感器</th><th>参数</th><th>量程</th><th>精度</th><th>采样率</th><th>功耗</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">风速/风向</td><td>Wind Speed/Dir</td><td class="td-val">0-30 m/s</td><td>±1 m/s</td><td>1 Hz</td><td>&lt;200 mW</td></tr>
+        <tr><td class="td-highlight">气温</td><td>Air Temperature</td><td class="td-val">-130 ~ +20 °C</td><td>±0.5 °C</td><td>1 Hz</td><td>&lt;50 mW</td></tr>
+        <tr><td class="td-highlight">地表温度</td><td>Ground Temp</td><td class="td-val">-130 ~ +30 °C</td><td>±1 °C</td><td>0.1 Hz</td><td>&lt;50 mW</td><td></tr>
+        <tr><td class="td-highlight">气压</td><td>Pressure</td><td class="td-val">500-800 Pa</td><td>±1 Pa</td><td>1 Hz</td><td>&lt;100 mW</td></tr>
+        <tr><td class="td-highlight">相对湿度</td><td>Relative Humidity</td><td class="td-val">0-100%</td><td>±5%</td><td>0.5 Hz</td><td>&lt;50 mW</td></tr>
+        <tr><td class="td-highlight">UV辐射</td><td>UV Index</td><td class="td-val">0-15+ UVI</td><td>±0.5 UVI</td><td>0.1 Hz</td><td>&lt;30 mW</td></tr>
+        <tr><td class="td-highlight">尘暴光学厚度</td><td>Dust AOD</td><td class="td-val">0-5 τ</td><td>±0.05 τ</td><td>0.05 Hz</td><td>&lt;500 mW</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">B. MarsMon 三层监测架构 / Three-Layer Architecture</h3>
+  <div class="card-grid card-grid-3">
+    <div class="card card-green">
+      <div class="card-header"><div class="card-icon card-icon-green">🌐</div><div><h3>外层监测</h3><div class="zh-sub">Outer · 5km半径</div></div></div>
+      <div class="card-body">气象站阵列、THz-ISAC尘暴探测节点、地震仪台网。覆盖基地5km范围环境态势感知。</div>
+    </div>
+    <div class="card card-teal">
+      <div class="card-header"><div class="card-icon card-icon-teal">🏠</div><div><h3>周界监测</h3><div class="zh-sub">Perimeter · 0-100m</div></div></div>
+      <div class="card-body">辐射监测节点、粉尘积聚传感器、热成像摄像头、微陨石撞击探测器。基地外壳健康状态实时监控。</div>
+    </div>
+    <div class="card card-emerald">
+      <div class="card-header"><div class="card-icon card-icon-emerald">🫁</div><div><h3>内部监测</h3><div class="zh-sub">Interior · ECLSS+Habitat</div></div></div>
+      <div class="card-body">ECLSS传感器（O₂/CO₂/压力/温度/湿度）、声学泄漏检测、人员穿戴式体征监测。生命支持闭环核心。</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">C. THz-ISAC 尘暴预警 / THz Dust Storm Detection</h3>
+  <div class="formula-box">
+    AOD(τ) = −ln(P<sub>rx</sub> / P<sub>tx</sub>) / cos(θ)<br>
+    频段：0.3-1.0 THz &nbsp;|&nbsp; 节点间距：1-20 km &nbsp;|&nbsp; AOD检测精度：~0.05 &nbsp;|&nbsp; 预警提前量：2-3 hr
+  </div>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>等级</th><th>AOD范围</th><th>含义</th><th>自动响应</th></tr></thead>
+      <tbody>
+        <tr><td class="td-check">🟢 GREEN</td><td class="td-val">τ &lt; 0.1</td><td>大气清澈，正常作业</td><td>无</td></tr>
+        <tr><td style="color:#eab308;font-weight:700;">🟡 YELLOW</td><td class="td-val">0.1 ≤ τ &lt; 0.5</td><td>轻度扬尘，能见度下降</td><td>OMR召回、太阳能板预清洁</td></tr>
+        <tr><td style="color:#f97316;font-weight:700;">🟠 ORANGE</td><td class="td-val">0.5 ≤ τ &lt; 2.0</td><td>中度尘暴，太阳能骤降</td><td>全部室外机器人召回、储能切换</td></tr>
+        <tr><td style="color:#ef4444;font-weight:700;">🔴 RED</td><td class="td-val">τ ≥ 2.0</td><td>全球尘暴，生存模式</td><td>BICS全面接管、最低功耗运行</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">D. 辐射监测 / Radiation Monitoring</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>探测器类型</th><th>测量对象</th><th>功耗</th><th>特点</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">SSLTD</td><td>γ/中子剂量率</td><td class="td-val">&lt;50 mW</td><td>实时读出，灵敏度高</td></tr>
+        <tr><td class="td-highlight">TLD</td><td>累积剂量</td><td class="td-val">零功耗</td><td>被动累积，定期读取</td></tr>
+        <tr><td class="td-highlight">Si PIN</td><td>带电粒子谱</td><td class="td-val">&lt;100 mW</td><td>粒子鉴别能力强</td></tr>
+        <tr><td class="td-highlight">³He中子管</td><td>热中子通量</td><td class="td-val">&lt;200 mW</td><td>GCR次级中子监测</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.85rem;color:var(--text-secondary);margin-top:0.8rem;">Kriging插值生成2D剂量率分布图，1 Sol更新周期，1m×1m空间分辨率。用于标注居留限制区域和屏蔽不足区域。</p>
+</section>
+
+<hr class="section-divider" />
+<!-- SECTION 4: Robot System -->
+<section id="robots" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">AMRS</span>
+    <h2><span class="en">Autonomous Maintenance Robot System</span><span class="zh">自动化维护机器人系统</span></h2>
+  </div>
+
+  <div class="card" style="margin-bottom:2rem;">
+    <div class="card-header"><div class="card-icon card-icon-green">🏗️</div><div><span class="card-label label-green">Paradigm</span><h3>ARMADAS 范式</h3><div class="zh-sub">标准化体素 + 装配器 → 自建/自修/自重构</div></div></div>
+    <div class="card-body">ARMADAS（Architected Robotics for Manufacturing, Assembly, and Deployable Autonomous Systems）：将基地结构分解为标准化体素单元（voxel），由专用装配器机器人进行组装/拆卸/重构。修复=替换受损体素+重装，扩展=制造新体素+装配，重构=拆旧区体素+新区装配。材料流闭环：火星壤→体素→结构→回收→再制造。</div>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem;">五类机器人规格 / Five Robot Classes</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>类别</th><th>名称</th><th>场景</th><th>关键规格</th><th>导航</th><th>功耗</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">Class-1</td><td>MFA<br/><span style="font-size:0.7rem;">Fixed Arm</span></td><td>室内固定作业</td><td class="td-val">7DOF, 2.5m臂展, 50kg负载, ±1mm</td><td>关节编码器</td><td>~500W</td></tr>
+        <tr><td class="td-highlight">Class-2</td><td>MSR<br/><span style="font-size:0.7rem;">Mobile Service</span></td><td>室内移动</td><td class="td-val">腿/轮混合, 0-3m/s, 30kg负载</td><td>UWB+LiDAR</td><td>~300W</td></tr>
+        <tr><td class="td-highlight">Class-3</td><td>OMR<br/><span style="font-size:0.7rem;">Outdoor Maintenance</span></td><td>室外维护</td><td class="td-val">6轮摇臂悬挂, 0-1.5m/s, 200kg负载</td><td>VO+LiDAR SLAM</td><td>~800W</td></tr>
+        <tr><td class="td-highlight">Class-4</td><td>MAV<br/><span style="font-size:0.7rem;">Mars Aerial Vehicle</span></td><td>空中侦察</td><td class="td-val">旋翼, 5-50m高度, &lt;5kg载荷</td><td>VO+IMU</td><td>~800W</td></tr>
+        <tr><td class="td-highlight">Class-5</td><td>IRB<br/><span style="font-size:0.7rem;">ISRU Heavy</span></td><td>重型资源开采</td><td class="td-val">可更换工具头, 履带/轮式, &gt;500kg</td><td>RTK+LiDAR</td><td>~5kW</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">MAV 气动挑战 / MAV Aerodynamic Challenge</h3>
+  <div class="card-grid card-grid-2">
+    <div class="card card-green">
+      <h3 style="font-size:0.95rem;color:var(--text-primary);margin-bottom:0.8rem;">悬停功率计算</h3>
+      <div class="formula-box">
+        P<sub>hover</sub> = (W<sup>3/2</sup>) / (√2 · ρ · A)<br><br>
+        火星参数：ρ = 0.020 kg/m³, g = 3.72 m/s²<br>
+        火星悬停功率 ≈ <strong>802 W</strong><br>
+        地球等效 ≈ 102 W<br>
+        <span style="color:#f4a234;">功耗比 ≈ 7.9×</span>
+      </div>
+      <p style="font-size:0.82rem;color:var(--text-secondary);margin-top:0.5rem;">火星大气密度仅为地球的1.6%，旋翼必须大幅增加转速和桨盘面积才能产生足够升力。这是MAV设计的第一约束。</p>
+    </div>
+    <div class="card card-teal">
+      <h3 style="font-size:0.95rem;color:var(--text-primary);margin-bottom:0.8rem;">Ingenuity → MAV 演化</h3>
+      <div class="data-table-wrap" style="margin-top:0.5rem;">
+        <table class="data-table">
+          <thead><tr><th>参数</th><th>Ingenuity</th><th>MAV目标</th></tr></thead>
+          <tbody>
+            <tr><td class="td-highlight">旋翼直径</td><td>1.2 m</td><td class="td-val">2.0 m</td></tr>
+            <tr><td class="td-highlight">起飞质量</td><td>1.8 kg</td><td class="td-val">&lt;15 kg</td></tr>
+            <tr><td class="td-highlight">飞行时间</td><td>~3 min</td><td class="td-val">&gt;15 min</td></tr>
+            <tr><td class="td-highlight">最大高度</td><td>12 m</td><td class="td-val">50 m</td></tr>
+            <tr><td class="td-highlight">载荷</td><td>0.3 kg</td><td class="td-val">5 kg</td></tr>
+            <tr><td class="td-highlight">自主能力</td><td>预规划航线</td><td class="td-val">实时避障+建图</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">多机器人协同 / Multi-Robot Coordination</h3>
+  <div class="card-grid card-grid-2">
+    <div class="card card-emerald">
+      <div class="card-header"><div class="card-icon card-icon-emerald">📊</div><div><h3>去中心化任务分配</h3><div class="zh-sub">Decentralized Auction</div></div></div>
+      <div class="card-body">基于拍卖算法的去中心化任务分配：每个机器人维护自身能力模型和电量状态，任务发布后各机器人出价，最高价者中标。单次分配&lt;1s，支持动态重分配。无需中央调度器，L2层仅做冲突检测。</div>
+    </div>
+    <div class="card card-green">
+      <div class="card-header"><div class="card-icon card-icon-green">🗺️</div><div><h3>协同SLAM建图</h3><div class="zh-sub">Cooperative SLAM</div></div></div>
+      <div class="card-body">多机器人协同SLAM：各机器人独立运行LiDAR SLAM，通过MarsNet共享子地图和关键帧。BICS进行全局地图融合和闭环检测。地图更新频率：10Hz（局部），1Hz（全局融合）。</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">维护任务自动触发矩阵 / Auto-Trigger Matrix</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>触发事件</th><th>检测源</th><th>响应机器人</th><th>动作</th><th>时限</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">太阳能板积尘</td><td>EMN+发电量监测</td><td>OMR+MSR</td><td>清洁/更换面板</td><td class="td-val">&lt;4h</td></tr>
+        <tr><td class="td-highlight">SHM结构告警</td><td>应变片+加速度计</td><td>MFA+MSR</td><td>检查+临时加固</td><td class="td-val">&lt;1h</td></tr>
+        <tr><td class="td-highlight">ECLSS异常</td><td>气体传感器</td><td>MSR</td><td>隔离+维修</td><td class="td-val">&lt;10min</td></tr>
+        <tr><td class="td-highlight">机器人故障</td><td>自检心跳</td><td>同类机器人</td><td>任务接管+拖回</td><td class="td-val">&lt;30min</td></tr>
+        <tr><td class="td-highlight">热控异常</td><td>温度传感器阵列</td><td>MSR+OMR</td><td>隔热修复+热管更换</td><td class="td-val">&lt;2h</td></tr>
+        <tr><td class="td-highlight">尘暴RED级</td><td>THz-ISAC</td><td>全部OMR+MAV</td><td>紧急召回+密封</td><td class="td-val">&lt;30min</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="section-divider" />
+<!-- SECTION 5: MarsNet -->
+<section id="marsnet" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">MarsNet</span>
+    <h2><span class="en">Internal Network</span><span class="zh">内部互联网络</span></h2>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem;">A. 为什么不用 Wi-Fi / Why Not Wi-Fi</h3>
+  <div class="card-grid card-grid-3">
+    <div class="card card-red">
+      <div class="card-header"><div class="card-icon card-icon-red">⏱️</div><div><h3>确定性时延</h3><div class="zh-sub">Deterministic Latency</div></div></div>
+      <div class="card-body">Wi-Fi CSMA/CA本质是竞争接入，时延抖动可达数十ms。ECLSS阀门控制要求&lt;500μs确定性时延，Wi-Fi无法满足。</div>
+    </div>
+    <div class="card card-amber">
+      <div class="card-header"><div class="card-icon card-icon-amber">☢️</div><div><h3>辐射SEU</h3><div class="zh-sub">Single Event Upset</div></div></div>
+      <div class="card-body">GCR 240mSv/yr持续轰击，消费级Wi-Fi芯片无抗辐射设计，SEU率远超工业级TSN交换机。关键域必须用辐射加固有线链路。</div>
+    </div>
+    <div class="card card-purple">
+      <div class="card-header"><div class="card-icon card-icon-purple">📻</div><div><h3>频谱干扰</h3><div class="zh-sub">Spectrum Interference</div></div></div>
+      <div class="card-body">2.4/5GHz ISM频段在密闭金属舱内多径效应严重，5类机器人+人员设备同时接入时干扰不可控。无法做域隔离。</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">B. 四域隔离架构 / Four-Domain Isolation</h3>
+  <div class="diagram-wrap">
+    <svg class="diagram-svg" viewBox="0 0 860 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="gCD" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient>
+        <linearGradient id="gCT" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f4a234"/><stop offset="100%" stop-color="#e8621a"/></linearGradient>
+        <linearGradient id="gDT" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient>
+        <linearGradient id="gGS" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8bacc8"/><stop offset="100%" stop-color="#4a6580"/></linearGradient>
+      </defs>
+      <!-- Critical Domain -->
+      <rect x="30" y="20" width="800" height="80" rx="12" fill="url(#gCD)" opacity="0.15" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="60" y="52" fill="#ef4444" font-size="14" font-weight="700" font-family="Segoe UI">CD · Critical Domain</text>
+      <text x="60" y="78" fill="rgba(255,255,255,0.6)" font-size="11" font-family="Segoe UI">ECLSS · Emergency · 有线TSN · &lt;500μs · 99.999% · 10Gbps</text>
+      <!-- Control Domain -->
+      <rect x="30" y="110" width="800" height="80" rx="12" fill="url(#gCT)" opacity="0.15" stroke="#f4a234" stroke-width="1.5"/>
+      <text x="60" y="142" fill="#f4a234" font-size="14" font-weight="700" font-family="Segoe UI">CT · Control Domain</text>
+      <text x="60" y="168" fill="rgba(255,255,255,0.6)" font-size="11" font-family="Segoe UI">Robots · ISRU · 有线+无线 · &lt;10ms · 99.99% · 1Gbps</text>
+      <!-- Data Domain -->
+      <rect x="30" y="200" width="800" height="80" rx="12" fill="url(#gDT)" opacity="0.15" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="60" y="232" fill="#22c55e" font-size="14" font-weight="700" font-family="Segoe UI">DT · Data Domain</text>
+      <text x="60" y="258" fill="rgba(255,255,255,0.6)" font-size="11" font-family="Segoe UI">Science · Video · 有线 · &lt;1s · 99.9% · 10Gbps</text>
+      <!-- Guest Domain -->
+      <rect x="30" y="290" width="800" height="80" rx="12" fill="url(#gGS)" opacity="0.12" stroke="#8bacc8" stroke-width="1"/>
+      <text x="60" y="322" fill="#8bacc8" font-size="14" font-weight="700" font-family="Segoe UI">GS · Guest Domain</text>
+      <text x="60" y="348" fill="rgba(255,255,255,0.6)" font-size="11" font-family="Segoe UI">Personal · 无线 · &lt;10s · Best-effort · 100Mbps</text>
+      <!-- Isolation arrows -->
+      <text x="830" y="100" fill="var(--text-muted)" font-size="9" font-family="Segoe UI" text-anchor="end">↑ 物理/逻辑隔离 ↑</text>
+      <text x="830" y="190" fill="var(--text-muted)" font-size="9" font-family="Segoe UI" text-anchor="end">↑ 逻辑隔离 ↑</text>
+      <text x="830" y="280" fill="var(--text-muted)" font-size="9" font-family="Segoe UI" text-anchor="end">↑ 逻辑隔离 ↑</text>
+    </svg>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">C. MarsNet 七层协议栈 / 7-Layer Protocol Stack</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>层</th><th>OSI对应</th><th>CD域</th><th>CT域</th><th>DT域</th><th>GS域</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">L7</td><td>应用</td><td>ECLSS控制协议</td><td>ROS2/DDS</td><td>FITS/HDF5</td><td>HTTP/WS</td></tr>
+        <tr><td class="td-highlight">L6</td><td>表示</td><td>ASN.1编码</td><td>CBOR</td><td>CBOR/JSON</td><td>JSON</td></tr>
+        <tr><td class="td-highlight">L5</td><td>会话</td><td>TSN流预留</td><td>DDS QoS</td><td>FTP/SFTP</td><td>TLS 1.3</td></tr>
+        <tr><td class="td-highlight">L4</td><td>传输</td><td>Raw/TCP</td><td>UDP/QUIC</td><td>TCP</td><td>TCP</td></tr>
+        <tr><td class="td-highlight">L3</td><td>网络</td><td>VLAN隔离</td><td>IPv6+SRV6</td><td>IPv6</td><td>IPv6+NAT</td></tr>
+        <tr><td class="td-highlight">L2</td><td>链路</td><td>802.1Qbv+CB</td><td>802.1Q+60GHz</td><td>802.1Q</td><td>802.11ax</td></tr>
+        <tr><td class="td-highlight">L1</td><td>物理</td><td>10GBase-T(屏蔽)</td><td>1GBase-T/60GHz</td><td>10GBase-T</td><td>5GHz Wi-Fi6</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">D. TSN 时间敏感网络 / Time-Sensitive Networking</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>IEEE标准</th><th>功能</th><th>关键指标</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">802.1AS</td><td>gPTP精确时钟同步</td><td class="td-val">时钟精度 &lt;1μs</td></tr>
+        <tr><td class="td-highlight">802.1Qbv</td><td>TAS时间感知调度</td><td class="td-val">时延抖动 &lt;10μs</td></tr>
+        <tr><td class="td-highlight">802.1Qbu/3br</td><td>帧抢占</td><td class="td-val">抢占时延 &lt;125μs</td></tr>
+        <tr><td class="td-highlight">802.1CB</td><td>FRER帧复制与消除</td><td class="td-val">可靠性 99.9999%</td></tr>
+        <tr><td class="td-highlight">802.1Qcc</td><td>CNC集中网络配置</td><td class="td-val">重收敛 &lt;1s</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4 style="font-size:0.95rem;color:var(--aux-teal);margin:1.5rem 0 0.8rem;">1ms TSN 超帧结构</h4>
+  <div class="diagram-wrap">
+    <svg class="diagram-svg" viewBox="0 0 860 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="40" width="80" height="60" rx="4" fill="#ef4444" opacity="0.7"/>
+      <text x="60" y="75" text-anchor="middle" fill="white" font-size="10" font-weight="700" font-family="Segoe UI">P0</text>
+      <rect x="105" y="40" width="80" height="60" rx="4" fill="#f4a234" opacity="0.7"/>
+      <text x="145" y="75" text-anchor="middle" fill="white" font-size="10" font-weight="700" font-family="Segoe UI">P1</text>
+      <rect x="190" y="40" width="240" height="60" rx="4" fill="#22c55e" opacity="0.7"/>
+      <text x="310" y="75" text-anchor="middle" fill="white" font-size="10" font-weight="700" font-family="Segoe UI">P2 · Robot Ctrl</text>
+      <rect x="435" y="40" width="240" height="60" rx="4" fill="#14b8a6" opacity="0.5"/>
+      <text x="555" y="75" text-anchor="middle" fill="white" font-size="10" font-weight="700" font-family="Segoe UI">P3 · Sensor</text>
+      <rect x="680" y="40" width="120" height="60" rx="4" fill="#8bacc8" opacity="0.4"/>
+      <text x="740" y="75" text-anchor="middle" fill="white" font-size="10" font-weight="700" font-family="Segoe UI">P4 · Diag</text>
+      <rect x="805" y="40" width="40" height="60" rx="4" fill="#4a6580" opacity="0.3"/>
+      <text x="825" y="75" text-anchor="middle" fill="white" font-size="8" font-weight="700" font-family="Segoe UI">G</text>
+      <!-- Labels -->
+      <text x="60" y="118" text-anchor="middle" fill="#ef4444" font-size="9" font-family="Segoe UI">0-100μs</text>
+      <text x="145" y="118" text-anchor="middle" fill="#f4a234" font-size="9" font-family="Segoe UI">100-200μs</text>
+      <text x="310" y="118" text-anchor="middle" fill="#22c55e" font-size="9" font-family="Segoe UI">200-500μs</text>
+      <text x="555" y="118" text-anchor="middle" fill="#14b8a6" font-size="9" font-family="Segoe UI">500-800μs</text>
+      <text x="740" y="118" text-anchor="middle" fill="#8bacc8" font-size="9" font-family="Segoe UI">800-950μs</text>
+      <text x="825" y="118" text-anchor="middle" fill="#4a6580" font-size="9" font-family="Segoe UI">950-1000μs</text>
+      <text x="60" y="30" text-anchor="middle" fill="var(--text-secondary)" font-size="9" font-family="Segoe UI">ECLSS</text>
+      <text x="145" y="30" text-anchor="middle" fill="var(--text-secondary)" font-size="9" font-family="Segoe UI">SHM</text>
+      <text x="825" y="30" text-anchor="middle" fill="var(--text-secondary)" font-size="9" font-family="Segoe UI">Guard</text>
+    </svg>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">E. 60GHz 室内无线 / 60GHz mmWave Indoor</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>维度</th><th>60GHz mmWave</th><th>5GHz Wi-Fi</th><th>结论</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">带宽</td><td class="td-val">~9GHz</td><td>~0.5GHz</td><td class="td-check">60GHz 18×</td></tr>
+        <tr><td class="td-highlight">时延确定性</td><td class="td-val">TDMA调度 &lt;100μs</td><td>CSMA/CA 不可控</td><td class="td-check">60GHz ✓</td></tr>
+        <tr><td class="td-highlight">空间复用</td><td class="td-val">高（波束窄）</td><td>低（全向）</td><td class="td-check">60GHz ✓</td></tr>
+        <tr><td class="td-highlight">穿透性</td><td>低（墙壁=天然隔离）</td><td>高（跨舱泄漏）</td><td class="td-check">60GHz 安全+</td></tr>
+        <tr><td class="td-highlight">火星O₂吸收</td><td class="td-val" style="color:#22c55e;">无（CO₂大气无O₂吸收峰）</td><td>N/A</td><td class="td-check">火星优势！</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card card-green" style="margin-top:1rem;">
+    <div class="card-body" style="font-size:0.85rem;"><strong style="color:var(--aux-teal);">关键发现：</strong>地球上60GHz频段有严重的O₂吸收峰（~15dB/km衰减），但在火星上，大气成分以CO₂为主（95.3%），几乎不含O₂，因此<strong style="color:var(--aux-green);">60GHz在火星无O₂吸收峰</strong>！这意味着火星上的60GHz链路质量远优于地球同频段，是CT域无线接入的最佳选择。</div>
+  </div>
+  <p style="font-size:0.82rem;color:var(--text-secondary);margin-top:0.8rem;">AP布局：每10m居住舱4个AP，间距~7m，总带宽100Gbps，单机器人保障1Gbps。</p>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">F. UWB 精确定位 / UWB Precise Positioning</h3>
+  <div class="formula-box">
+    d = c / 2 × Δt<sub>TOF</sub> &nbsp;&nbsp;(TWR双向测距)<br>
+    精度：±0.1m (3D) &nbsp;|&nbsp; 更新率：100Hz(机器人) / 10Hz(人员) &nbsp;|&nbsp; 标签容量：&gt;200 &nbsp;|&nbsp; 单锚点功耗：&lt;100mW
+  </div>
+</section>
+
+<hr class="section-divider" />
+<!-- SECTION 6: BICS -->
+<section id="bics" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">BICS</span>
+    <h2><span class="en">Base Intelligent Control System</span><span class="zh">基地中央智能控制系统</span></h2>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem;">A. 数字孪生四要素 / Digital Twin Components (CMU 2024)</h3>
+  <div class="card-grid card-grid-4">
+    <div class="card card-green">
+      <div class="card-header"><div class="card-icon card-icon-green">🏭</div><div><h3>Physical Asset</h3><div class="zh-sub">物理资产</div></div></div>
+      <div class="card-body">火星基地全部物理实体：居住舱、ECLSS、能源设备、机器人、传感器网络。</div>
+    </div>
+    <div class="card card-teal">
+      <div class="card-header"><div class="card-icon card-icon-teal">💻</div><div><h3>Digital Model</h3><div class="zh-sub">数字模型</div></div></div>
+      <div class="card-body">物理资产的高保真仿真模型，包含热力学、结构力学、流体动力学多物理场耦合。</div>
+    </div>
+    <div class="card card-emerald">
+      <div class="card-header"><div class="card-icon card-icon-emerald">🔗</div><div><h3>Data Connection</h3><div class="zh-sub">数据连接</div></div></div>
+      <div class="card-body">MarsNet实时数据流：10000+传感器→100:1压缩→异常过滤→上下文融合→10关键指标。</div>
+    </div>
+    <div class="card card-amber">
+      <div class="card-header"><div class="card-icon card-icon-amber">🧠</div><div><h3>Intelligent Services</h3><div class="zh-sub">智能服务</div></div></div>
+      <div class="card-body">预测性维护、应急推演、资源优化、NLQI自然语言查询。AI决策引擎的核心。</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">B. 计算硬件 / Computing Hardware</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>平台</th><th>架构</th><th>算力</th><th>抗辐照</th><th>功耗</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">AMD Kintex UltraScale+</td><td>Rad-hard FPGA</td><td class="td-val">10 TOPS</td><td>&gt;1 Mrad</td><td>&lt;20W</td><td>L1实时控制</td></tr>
+        <tr><td class="td-highlight">VORAGO VA10820</td><td>ARM Cortex-M</td><td class="td-val">~50 DMIPS</td><td>&gt;300 krad</td><td class="td-val">&lt;0.5W</td><td>传感器节点</td></tr>
+        <tr><td class="td-highlight">Microchip PolarFire SoC</td><td>RISC-V + FPGA</td><td class="td-val">~2 TOPS</td><td>&gt;100 krad</td><td>&lt;5W</td><td>L2协调</td></tr>
+        <tr><td class="td-highlight">Custom Rad-hard GPU (2030+)</td><td>GPU</td><td class="td-val">~100 TOPS</td><td>&gt;100 krad</td><td>&lt;50W</td><td>L3数字孪生+LLM</td></tr>
+        <tr><td class="td-highlight">Lattice ECP5 + TMR</td><td>FPGA</td><td class="td-val">ns确定性</td><td>&gt;1 Mrad</td><td>&lt;2W</td><td>安全联锁</td></tr>
+        <tr><td class="td-highlight">3D NAND Flash</td><td>存储</td><td class="td-val">10TB+</td><td>&gt;100 krad</td><td>&lt;5W</td><td>数据存档</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">C. 三模冗余 / Triple Modular Redundancy</h3>
+  <div class="card card-green" style="margin-bottom:1.5rem;">
+    <div class="card-body" style="font-size:0.85rem;">
+      <strong style="color:var(--aux-teal);">Active</strong>（运行中）+ <strong style="color:var(--aux-green);">Hot Standby</strong>（热备，&lt;1s切换）+ <strong style="color:var(--mars-amber);">Warm Standby</strong>（温备，&lt;10s切换）→ <strong style="color:var(--text-primary);">Majority Voter</strong>（多数表决器）<br><br>
+      任何单点故障被多数表决自动屏蔽，热备无缝接管。CAT-1安全关键系统（ECLSS、BICS核心）强制TMR配置。
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">D. BICS 分层 AI 决策引擎</h3>
+  <div class="diagram-wrap">
+    <svg class="diagram-svg" viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+      <!-- Perception -->
+      <rect x="20" y="20" width="220" height="200" rx="12" fill="rgba(34,197,94,0.1)" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="130" y="50" text-anchor="middle" fill="#22c55e" font-size="14" font-weight="700" font-family="Segoe UI">Perception</text>
+      <text x="130" y="72" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10">感知层</text>
+      <text x="130" y="100" text-anchor="middle" fill="var(--text-secondary)" font-size="9">10000+ 传感器</text>
+      <text x="130" y="120" text-anchor="middle" fill="var(--text-secondary)" font-size="9">100:1 压缩</text>
+      <text x="130" y="140" text-anchor="middle" fill="var(--text-secondary)" font-size="9">AI异常过滤</text>
+      <text x="130" y="160" text-anchor="middle" fill="var(--text-secondary)" font-size="9">上下文融合</text>
+      <text x="130" y="190" text-anchor="middle" fill="var(--aux-teal)" font-size="10" font-weight="600">10 关键指标</text>
+      <!-- Arrow -->
+      <path d="M250,120 L290,120" stroke="#22c55e" stroke-width="2" marker-end="url(#arrowG)"/>
+      <defs><marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#22c55e"/></marker></defs>
+      <!-- Cognition -->
+      <rect x="300" y="20" width="220" height="200" rx="12" fill="rgba(20,184,166,0.1)" stroke="#14b8a6" stroke-width="1.5"/>
+      <text x="410" y="50" text-anchor="middle" fill="#14b8a6" font-size="14" font-weight="700" font-family="Segoe UI">Cognition</text>
+      <text x="410" y="72" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10">认知层</text>
+      <text x="410" y="100" text-anchor="middle" fill="var(--text-secondary)" font-size="9">Digital Twin 推演</text>
+      <text x="410" y="120" text-anchor="middle" fill="var(--text-secondary)" font-size="9">MPC 模型预测控制</text>
+      <text x="410" y="140" text-anchor="middle" fill="var(--text-secondary)" font-size="9">RL 强化学习策略</text>
+      <text x="410" y="160" text-anchor="middle" fill="var(--text-secondary)" font-size="9">&lt;7B LLM 本地推理</text>
+      <text x="410" y="190" text-anchor="middle" fill="var(--aux-teal)" font-size="10" font-weight="600">决策 + 预测</text>
+      <!-- Arrow -->
+      <path d="M530,120 L570,120" stroke="#14b8a6" stroke-width="2" marker-end="url(#arrowT)"/>
+      <defs><marker id="arrowT" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#14b8a6"/></marker></defs>
+      <!-- Action -->
+      <rect x="580" y="20" width="200" height="200" rx="12" fill="rgba(244,162,52,0.1)" stroke="#f4a234" stroke-width="1.5"/>
+      <text x="680" y="50" text-anchor="middle" fill="#f4a234" font-size="14" font-weight="700" font-family="Segoe UI">Action</text>
+      <text x="680" y="72" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10">执行层</text>
+      <text x="680" y="100" text-anchor="middle" fill="var(--text-secondary)" font-size="9">L1: &lt;10ms 硬实时</text>
+      <text x="680" y="120" text-anchor="middle" fill="var(--text-secondary)" font-size="9">L2: &lt;1s 子系统</text>
+      <text x="680" y="140" text-anchor="middle" fill="var(--text-secondary)" font-size="9">L3: &lt;10s 规划</text>
+      <text x="680" y="160" text-anchor="middle" fill="var(--text-secondary)" font-size="9">L4: 3-22min 地球</text>
+      <text x="680" y="190" text-anchor="middle" fill="var(--mars-amber)" font-size="10" font-weight="600">执行 + 反馈</text>
+    </svg>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">E. 应急决策矩阵 / Emergency Decision Matrix</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>场景</th><th>检测源</th><th>BICS决策</th><th>响应层</th><th>时限</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight" style="color:#ef4444;">舱体泄漏</td><td>气压骤降+声学</td><td>隔离舱段+启动补压+EVA封堵</td><td>L1</td><td class="td-val">&lt;30s</td></tr>
+        <tr><td class="td-highlight" style="color:#ef4444;">CO₂ &gt; 1%</td><td>ECLSS传感器</td><td>增加净化+人员转移+限制活动</td><td>L1</td><td class="td-val">&lt;5min</td></tr>
+        <tr><td class="td-highlight" style="color:#f4a234;">辐射突增</td><td>SSLTD+TLD</td><td>人员撤入屏蔽区+限制EVA</td><td>L2</td><td class="td-val">&lt;15min</td></tr>
+        <tr><td class="td-highlight" style="color:#f4a234;">主电源故障</td><td>功率监测</td><td>切备用+启动非关键负载卸载</td><td>L1</td><td class="td-val">&lt;10s</td></tr>
+        <tr><td class="td-highlight" style="color:#eab308;">尘暴RED级</td><td>THz-ISAC</td><td>全面召回+最小功耗+储能切换</td><td>L3</td><td class="td-val">T-2hr</td></tr>
+        <tr><td class="td-highlight" style="color:#eab308;">机器人集群故障</td><td>心跳超时</td><td>重新拍卖分配+启用冗余</td><td>L2</td><td class="td-val">&lt;30s</td></tr>
+        <tr><td class="td-highlight" style="color:#8bacc8;">通信中断</td><td>DTN超时</td><td>BICS完全自治+定时重连</td><td>L3→L4</td><td class="td-val">持续</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- SECTION 7: IPN -->
+<section id="ipn" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">IPN</span>
+    <h2><span class="en">Inter-Planetary Network</span><span class="zh">跨星际通信网络</span></h2>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem;">A. 火星-地球通信约束 / Mars-Earth Constraints</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>参数</th><th>最近距</th><th>最远距</th><th>典型值</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">地火距离</td><td class="td-val">~55.7M km</td><td class="td-val">~401M km</td><td>~225M km</td></tr>
+        <tr><td class="td-highlight">单向时延</td><td class="td-val">~3.1 min</td><td class="td-val">~22.3 min</td><td>~12.5 min</td></tr>
+        <tr><td class="td-highlight">工作频段</td><td colspan="3">Ka-band (32/34 GHz)</td></tr>
+        <tr><td class="td-highlight">DSN天线</td><td colspan="3">70m (Goldstone/Canberra/Madrid)</td></tr>
+        <tr><td class="td-highlight">合日窗口</td><td colspan="3">~14天完全中断，每780天一次</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">B. 链路预算 / Link Budget</h3>
+  <div class="card-grid card-grid-2">
+    <div class="card card-green">
+      <h3 style="font-size:0.95rem;color:var(--text-primary);margin-bottom:0.8rem;">发射端</h3>
+      <div class="formula-box">
+        P<sub>tx</sub> = 200W → 23 dBW<br>
+        G<sub>tx</sub> = 57.4 dBi (4m天线)<br>
+        EIRP = P<sub>tx</sub> + G<sub>tx</sub> = <strong>80.4 dBW</strong>
+      </div>
+    </div>
+    <div class="card card-teal">
+      <h3 style="font-size:0.95rem;color:var(--text-primary);margin-bottom:0.8rem;">接收端</h3>
+      <div class="formula-box">
+        G<sub>rx</sub> = 78.1 dBi (70m DSN)<br>
+        T<sub>sys</sub> = 25 K<br>
+        FSPL<sub>max</sub> = 292.8 dB<br>
+        C/N₀ = <strong>80.3 dB·Hz</strong>
+      </div>
+    </div>
+  </div>
+  <div class="card card-emerald" style="margin-top:1rem;">
+    <div class="card-body" style="font-size:0.85rem;">
+      <strong style="color:var(--aux-teal);">数据率估算：</strong><br>
+      最差情况（最远距）：<strong style="color:var(--text-primary);">~9.5 Mbps</strong><br>
+      最佳情况（最近距）：<strong style="color:var(--text-primary);">~513 Mbps</strong><br>
+      典型值：~50-100 Mbps（足够支撑HDTN数据传输+科学数据回传）
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">C. HDTN 协议 / NASA HDTN</h3>
+  <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">NASA HDTN（2024年ISS在轨测试验证，2025年获R&amp;D 100奖），支持多路径并发传输、 custody transfer、BPSec端到端安全。</p>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>特性</th><th>HDTN</th><th>DTN (BPv7)</th><th>TCP/IP</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">时延容忍</td><td class="td-check">✓ 无限时延</td><td class="td-check">✓ 小时级</td><td style="color:#ef4444;">✗ 分钟级极限</td></tr>
+        <tr><td class="td-highlight">多路径</td><td class="td-check">✓ 并发传输</td><td>单路径</td><td>单路径</td></tr>
+        <tr><td class="td-highlight">安全</td><td class="td-check">✓ BPSec内置</td><td>可选</td><td>TLS</td></tr>
+        <tr><td class="td-highlight">存储转发</td><td class="td-check">✓ Custody</td><td class="td-check">✓</td><td style="color:#ef4444;">✗</td></tr>
+        <tr><td class="td-highlight">合日生存</td><td class="td-check">✓ 自动暂停/恢复</td><td class="td-check">✓</td><td style="color:#ef4444;">✗ 连接断开</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4 style="font-size:0.95rem;color:var(--aux-teal);margin:1.5rem 0 0.8rem;">DTN EID 命名方案</h4>
+  <div class="code-block"><span class="code-comment">/* DTN Endpoint ID Naming */</span>
+ipn:<span class="code-keyword">1</span>.1     <span class="code-comment">// Earth DSN Gateway</span>
+ipn:<span class="code-keyword">4</span>.1     <span class="code-comment">// Mars Base Alpha</span>
+ipn:<span class="code-keyword">4</span>.11    <span class="code-comment">// Areosynchronous Relay-1</span>
+ipn:<span class="code-keyword">4</span>.12    <span class="code-comment">// Areosynchronous Relay-2</span>
+ipn:<span class="code-keyword">4</span>.999   <span class="code-comment">// Emergency Broadcast (flood)</span></div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">D. 合日生存包 / Solar Conjunction Survival</h3>
+  <div class="timeline">
+    <div class="timeline-item"><div class="timeline-dot dot-amber">T-30</div><div class="timeline-time">T-30天</div><div class="timeline-content"><h4>预备阶段</h4><p>上传30天自主运行计划，BICS加载完整任务序列。所有软件更新冻结。检查储能充足性（≥14天最低功耗运行）。</p></div></div>
+    <div class="timeline-item"><div class="timeline-dot dot-amber">T-14</div><div class="timeline-time">T-14天</div><div class="timeline-content"><h4>降级启动</h4><p>非关键科学实验暂停。DTN开启store-and-forward模式，所有数据本地缓存。BICS切换L3完全自治模式。</p></div></div>
+    <div class="timeline-item"><div class="timeline-dot dot-red">T-0</div><div class="timeline-time">T-0（合日中心）</div><div class="timeline-content"><h4>完全中断</h4><p>上下行全断。BICS独立运行全部决策。机器人按预编程计划执行维护任务。仅ECLSS和EMN保持高优先级。</p></div></div>
+    <div class="timeline-item"><div class="timeline-dot dot-green">T+14</div><div class="timeline-time">T+14天</div><div class="timeline-content"><h4>链路恢复</h4><p>DTN自动重连。批量发送缓存数据。BICS上传14天运行报告。地球团队评估后恢复L4控制。</p></div></div>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">E. 中继星座方案 / Relay Constellation</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>方案</th><th>轨道</th><th>卫星数</th><th>覆盖</th><th>评价</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">方案A</td><td>Areosynchronous</td><td>2</td><td>低纬基地有限覆盖</td><td>成本低，覆盖差</td></tr>
+        <tr><td class="td-highlight" style="color:var(--aux-green);">方案B ★</td><td>3极轨+1赤道</td><td class="td-val">4</td><td>全球覆盖+极地中继</td><td class="td-check">推荐基线</td></tr>
+        <tr><td class="td-highlight">方案C</td><td>LEO星链式</td><td>12</td><td>高频次过境</td><td>冗余高，成本高</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="section-divider" />
+<!-- SECTION 8: Cybersecurity -->
+<section id="security" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">Security</span>
+    <h2><span class="en">Base Cybersecurity</span><span class="zh">基地网络安全体系</span></h2>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem;">A. 威胁模型 / Threat Model</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>ID</th><th>威胁</th><th>来源</th><th>影响</th><th>缓解层级</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">T1</td><td>GCR单粒子翻转</td><td>宇宙射线</td><td>数据损坏、逻辑错误</td><td>L1 ECC+TMR</td></tr>
+        <tr><td class="td-highlight">T2</td><td>恶意地球指令</td><td>注入/劫持</td><td>危险操作执行</td><td>L3 双重验证</td></tr>
+        <tr><td class="td-highlight">T3</td><td>内部故障/误操作</td><td>软件缺陷/人为</td><td>系统异常</td><td>L2 权限隔离</td></tr>
+        <tr><td class="td-highlight">T4</td><td>DTN中继劫持</td><td>中间人攻击</td><td>数据篡改/窃听</td><td>BPSec+HDTN</td></tr>
+        <tr><td class="td-highlight">T5</td><td>机器人信道干扰</td><td>电磁/恶意</td><td>控制失效</td><td>L2 频率跳变</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">B. 零信任架构 / Zero Trust (NIST SP 800-207)</h3>
+  <div class="card card-green" style="margin-bottom:1.5rem;">
+    <div class="card-body" style="font-size:0.95rem;text-align:center;"><strong style="color:var(--aux-teal);">"Never trust, always verify"</strong><br><span style="color:var(--text-secondary);">永不信任，始终验证 — 即使是地球发来的指令</span></div>
+  </div>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>维度</th><th>实现</th><th>技术</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">身份验证</td><td>每次访问独立验证</td><td>mTLS + 硬件令牌</td></tr>
+        <tr><td class="td-highlight">最小权限</td><td>按需授权，默认拒绝</td><td>RBAC + ABAC</td></tr>
+        <tr><td class="td-highlight">微分段</td><td>MarsNet四域物理/逻辑隔离</td><td>VLAN + 防火墙</td></tr>
+        <tr><td class="td-highlight">持续监控</td><td>全流量审计+异常检测</td><td>BICS AI引擎</td></tr>
+        <tr><td class="td-highlight">数据保护</td><td>端到端加密+完整性校验</td><td>BPSec + AES-256-GCM</td></tr>
+        <tr><td class="td-highlight">应急响应</td><td>自动隔离+降级运行</td><td>BICS应急矩阵</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">C. 地球指令\u2018死人开关\u2019双重验证 / Dead Man's Switch</h3>
+  <div class="timeline">
+    <div class="timeline-item"><div class="timeline-dot dot-green">1</div><div class="timeline-time">Step 1 · Earth → Mars</div><div class="timeline-content"><h4>BPSec签名 + HDTN加密</h4><p>地球DSN发出指令，BPSec端到端签名，HDTN加密传输。防止T4中继劫持。</p></div></div>
+    <div class="timeline-item"><div class="timeline-dot dot-green">2</div><div class="timeline-time">Step 2 · Mars HDTN</div><div class="timeline-content"><h4>验证BPSec签名</h4><p>火星端HDTN网关验证签名完整性。签名不匹配→丢弃+告警。</p></div></div>
+    <div class="timeline-item"><div class="timeline-dot dot-amber">3</div><div class="timeline-time">Step 3 · BICS语义合规</div><div class="timeline-content"><h4>语义检查 + 数字孪生预演</h4><p>BICS AI引擎检查指令是否违反安全规则。数字孪生预演指令执行后果。违规→拒绝+地球反馈。</p></div></div>
+    <div class="timeline-item"><div class="timeline-dot dot-green">4</div><div class="timeline-time">Step 4 · 执行/拒绝</div><div class="timeline-content"><h4>安全则执行，不安全则拒绝</h4><p>通过全部检查→执行。任一环节不通过→拒绝执行，等待地球二次确认。</p></div></div>
+    <div class="timeline-item"><div class="timeline-dot dot-red">5</div><div class="timeline-time">Step 5 · 高危操作二次确认</div><div class="timeline-content"><h4>地球二次确认（25-45分钟往返）</h4><p>高危操作（如EVA计划变更、ISRU产线调整）必须等待地球二次确认。25-45分钟往返时延是安全代价。</p></div></div>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- SECTION 9: Resource Coordination -->
+<section id="urs" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">URS</span>
+    <h2><span class="en">Cross-Domain Resource Optimization</span><span class="zh">能源-网络-机器人三系统协同</span></h2>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem;">A. 统一资源调度器 / Unified Resource Scheduler</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>优先级</th><th>类别</th><th>典型功耗</th><th>带宽保障</th><th>计算分配</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight" style="color:#ef4444;">P0</td><td>生命支持（ECLSS）</td><td class="td-val">~8 kW</td><td>CD域最高</td><td>TMR专用</td></tr>
+        <tr><td class="td-highlight" style="color:#f4a234;">P1</td><td>安全（SHM+辐射监测）</td><td class="td-val">~2 kW</td><td>CD域</td><td>热备专用</td></tr>
+        <tr><td class="td-highlight" style="color:#eab308;">P2</td><td>维护（机器人+修復）</td><td class="td-val">~5 kW</td><td>CT域</td><td>按需分配</td></tr>
+        <tr><td class="td-highlight" style="color:#22c55e;">P3</td><td>ISRU资源生产</td><td class="td-val">~30 kW</td><td>CT域</td><td>可暂停</td></tr>
+        <tr><td class="td-highlight" style="color:#14b8a6;">P4</td><td>科学研究</td><td class="td-val">~10 kW</td><td>DT域</td><td>可暂停</td></tr>
+        <tr><td class="td-highlight" style="color:#8bacc8;">P5</td><td>个人/非关键</td><td class="td-val">~5 kW</td><td>GS域</td><td>最低保障</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.85rem;color:var(--text-secondary);margin-top:0.8rem;">MPC优化器：24小时预测窗口，LSTM需求预测。能源/带宽/计算三资源池统一优化，尘暴期间P3-P5自动降级。</p>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">B. 尘暴完整时间线 / Dust Storm Complete Timeline</h3>
+  <div class="timeline">
+    <div class="timeline-item"><div class="timeline-dot dot-amber">T-3h</div><div class="timeline-time">T-3小时 · THz-ISAC首次检测</div><div class="timeline-content">
+      <h4>EMN：THz-ISAC检测AOD上升趋势，发布YELLOW预警</h4>
+      <p>能量：太阳能板预清洁，储能充电至100%<br>机器人：OMR完成当前任务后返回基地附近<br>网络：MarsNet正常<br>BICS：加载尘暴应急预案</p>
+    </div></div>
+    <div class="timeline-item"><div class="timeline-dot dot-amber">T-2h</div><div class="timeline-time">T-2小时 · ORANGE预警</div><div class="timeline-content">
+      <h4>EMN：AOD≥0.5，升级ORANGE</h4>
+      <p>能量：P3-P5负载开始降级，储能切换热待命<br>机器人：全部OMR召回，MAV降落<br>网络：CT域降级为应急模式<br>BICS：数字孪生推演最坏情况</p>
+    </div></div>
+    <div class="timeline-item"><div class="timeline-dot dot-amber">T-1h</div><div class="timeline-time">T-1小时 · 预备切换</div><div class="timeline-content">
+      <h4>EMN：AOD持续上升，准备RED</h4>
+      <p>能量：ISRU产线降功率或暂停，储能正式接管<br>机器人：所有室外机器人密封停泊<br>网络：DT/GS域降级，CD/CT域保障<br>BICS：切换L3完全自治模式</p>
+    </div></div>
+    <div class="timeline-item"><div class="timeline-dot dot-red">T+0</div><div class="timeline-time">T+0 · RED级尘暴</div><div class="timeline-content">
+      <h4>EMN：AOD≥2.0，RED级全球尘暴</h4>
+      <p>能量：仅P0+P1运行，太阳能板断开，纯储能<br>机器人：全部休眠，仅Class-2室内待命<br>网络：MarsNet TIER-2（60GHz无线备用）<br>BICS：最小功耗运行，关键数据缓存</p>
+    </div></div>
+    <div class="timeline-item"><div class="timeline-dot dot-green">T+30d</div><div class="timeline-time">T+30天 · 尘暴消退</div><div class="timeline-content">
+      <h4>EMN：AOD降至&lt;0.5，降级ORANGE→YELLOW</h4>
+      <p>能量：太阳能板清洁恢复，储能切换充电<br>机器人：OMR唤醒执行面板清洁+结构检查<br>网络：逐步恢复TIER-0全速率<br>BICS：上传尘暴期间完整运行报告至地球</p>
+    </div></div>
+  </div>
+</section>
+
+<hr class="section-divider" />
+<!-- SECTION 10: MarsNav -->
+<section id="marsnav" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">MarsNav</span>
+    <h2><span class="en">Mars Navigation &amp; Time</span><span class="zh">火星导航与时间系统</span></h2>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem;">A. 火星时间定义 / Mars Time System</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>参数</th><th>值</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">Sol长度</td><td class="td-val">24h 39m 35.244s</td><td>比地球日长39分35秒</td></tr>
+        <tr><td class="td-highlight">火星年</td><td class="td-val">669.6 Sol</td><td>≈687地球日</td></tr>
+        <tr><td class="td-highlight">Ls季节</td><td>0°-360°太阳经度</td><td>Ls=0°春分，Ls=270°冬至（尘暴季）</td></tr>
+        <tr><td class="td-highlight">MTC</td><td>Mars Coordinated Time</td><td>类似UTC的火星标准时间</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">B. MarsNav 定位层级 / Positioning Tiers</h3>
+  <div class="card-grid card-grid-4">
+    <div class="card card-green">
+      <div class="card-header"><div class="card-icon card-icon-green">🏠</div><div><h3>室内</h3><div class="zh-sub">Indoor</div></div></div>
+      <div class="card-body">UWB TOA/TDOA</div>
+      <div class="card-metrics"><div class="metric"><div class="metric-val">±0.1m</div><div class="metric-label">精度</div></div><div class="metric"><div class="metric-val">100Hz</div><div class="metric-label">更新率</div></div></div>
+    </div>
+    <div class="card card-teal">
+      <div class="card-header"><div class="card-icon card-icon-teal">📍</div><div><h3>近场</h3><div class="zh-sub">≤1km</div></div></div>
+      <div class="card-body">VO+LiDAR SLAM</div>
+      <div class="card-metrics"><div class="metric"><div class="metric-val">±1m</div><div class="metric-label">精度</div></div><div class="metric"><div class="metric-val">10Hz</div><div class="metric-label">更新率</div></div></div>
+    </div>
+    <div class="card card-emerald">
+      <div class="card-header"><div class="card-icon card-icon-emerald">🗺️</div><div><h3>远场</h3><div class="zh-sub">&gt;1km</div></div></div>
+      <div class="card-body">三角测量+轨道伪距</div>
+      <div class="card-metrics"><div class="metric"><div class="metric-val">±10m</div><div class="metric-label">精度</div></div><div class="metric"><div class="metric-val">1Hz</div><div class="metric-label">更新率</div></div></div>
+    </div>
+    <div class="card card-amber">
+      <div class="card-header"><div class="card-icon card-icon-amber">☀️</div><div><h3>绝对</h3><div class="zh-sub">Absolute</div></div></div>
+      <div class="card-body">太阳/恒星观测</div>
+      <div class="card-metrics"><div class="metric"><div class="metric-val">±5km</div><div class="metric-label">精度</div></div><div class="metric"><div class="metric-val">Sol-1</div><div class="metric-label">更新率</div></div></div>
+    </div>
+  </div>
+
+  <div class="formula-box" style="margin-top:1rem;">
+    λ<sub>site</sub> = f(α<sub>sun</sub>, δ<sub>sun</sub>, θ<sub>hour</sub>) &nbsp;&nbsp;太阳位置公式：经度=函数(太阳方位角, 太阳赤纬, 时角)<br>
+    注：火星无GPS，导航依赖惯性测量+视觉里程计+星历表推算的组合。
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- SECTION 11: HMI -->
+<section id="hmi" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">HMI</span>
+    <h2><span class="en">Human-Machine Interface</span><span class="zh">人机交互系统</span></h2>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem;">A. CAIDS 信息管道 / Information Pipeline</h3>
+  <div class="diagram-wrap">
+    <svg class="diagram-svg" viewBox="0 0 860 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="25" width="120" height="50" rx="8" fill="rgba(34,197,94,0.2)" stroke="#22c55e" stroke-width="1"/>
+      <text x="70" y="55" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="700" font-family="Segoe UI">10,000+</text>
+      <text x="70" y="68" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">传感器</text>
+      <path d="M135,50 L165,50" stroke="#22c55e" stroke-width="2" marker-end="url(#ag1)"/>
+      <rect x="170" y="25" width="100" height="50" rx="8" fill="rgba(20,184,166,0.2)" stroke="#14b8a6" stroke-width="1"/>
+      <text x="220" y="55" text-anchor="middle" fill="#14b8a6" font-size="10" font-weight="700" font-family="Segoe UI">100:1</text>
+      <text x="220" y="68" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">压缩</text>
+      <path d="M275,50 L305,50" stroke="#14b8a6" stroke-width="2" marker-end="url(#at1)"/>
+      <rect x="310" y="25" width="100" height="50" rx="8" fill="rgba(5,150,105,0.2)" stroke="#059669" stroke-width="1"/>
+      <text x="360" y="55" text-anchor="middle" fill="#059669" font-size="10" font-weight="700" font-family="Segoe UI">AI Filter</text>
+      <text x="360" y="68" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">异常过滤</text>
+      <path d="M415,50 L445,50" stroke="#059669" stroke-width="2" marker-end="url(#ae1)"/>
+      <rect x="450" y="25" width="100" height="50" rx="8" fill="rgba(244,162,52,0.2)" stroke="#f4a234" stroke-width="1"/>
+      <text x="500" y="55" text-anchor="middle" fill="#f4a234" font-size="10" font-weight="700" font-family="Segoe UI">Context</text>
+      <text x="500" y="68" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">上下文融合</text>
+      <path d="M555,50 L585,50" stroke="#f4a234" stroke-width="2" marker-end="url(#aa1)"/>
+      <rect x="590" y="25" width="100" height="50" rx="8" fill="rgba(232,98,26,0.2)" stroke="#e8621a" stroke-width="1"/>
+      <text x="640" y="55" text-anchor="middle" fill="#e8621a" font-size="10" font-weight="700" font-family="Segoe UI">10 Indicators</text>
+      <text x="640" y="68" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">关键指标</text>
+      <path d="M695,50 L725,50" stroke="#e8621a" stroke-width="2" marker-end="url(#ao1)"/>
+      <rect x="730" y="25" width="120" height="50" rx="8" fill="rgba(34,197,94,0.3)" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="790" y="55" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="700" font-family="Segoe UI">NLQI</text>
+      <text x="790" y="68" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">自然语言</text>
+      <defs>
+        <marker id="ag1" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4" fill="#22c55e"/></marker>
+        <marker id="at1" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4" fill="#14b8a6"/></marker>
+        <marker id="ae1" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4" fill="#059669"/></marker>
+        <marker id="aa1" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4" fill="#f4a234"/></marker>
+        <marker id="ao1" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4" fill="#e8621a"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">B. NLQI 自然语言查询界面 / Natural Language Query</h3>
+  <div class="dialogue-box">
+    <div class="dialogue-line">
+      <div class="dialogue-avatar avatar-human">👨‍🚀</div>
+      <div class="dialogue-text"><span class="speaker">航天员</span>BICS，当前基地最需要关注的三个问题是什么？</div>
+    </div>
+    <div class="dialogue-line">
+      <div class="dialogue-avatar avatar-ai">🤖</div>
+      <div class="dialogue-text"><span class="speaker">BICS-NLQI</span>当前Top-3关注项：<br>
+<strong style="color:#ef4444;">1. ECLSS CO₂净化器-2效率下降12%</strong>（当前1.2% CO₂，阈值1.0%）— 已调度MSR-7更换滤芯，预计28min完成<br>
+<strong style="color:#eab308;">2. 太阳能板C区积尘AOD=0.35</strong>（功率下降18%）— OMR-3计划14:00清洁，预计恢复至95%<br>
+<strong style="color:#22c55e;">3. DSN链路窗口10:30-14:45 MTC</strong>（可用4h15min，待传数据2.1GB，优先级：科学数据→运行日志→软件更新）</div>
+    </div>
+  </div>
+  <p style="font-size:0.82rem;color:var(--text-secondary);margin-top:0.8rem;">NLQI后端：&lt;7B参数辐射加固LLM，本地执行，不依赖地球链路。模型推理延迟&lt;3s（100 TOPS GPU）。</p>
+</section>
+
+<hr class="section-divider" />
+
+<!-- SECTION 12: System Integration -->
+<section id="integration" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">Integration</span>
+    <h2><span class="en">System Integration</span><span class="zh">系统综合集成</span></h2>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem;">A. 接口控制矩阵 / Interface Control Matrix</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>ICD</th><th>接口A</th><th>接口B</th><th>数据类型</th><th>频率</th><th>协议</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">ICD-01</td><td>EMN</td><td>BICS</td><td>环境感知数据</td><td>1-10Hz</td><td>TSN+DDS</td></tr>
+        <tr><td class="td-highlight">ICD-02</td><td>BICS</td><td>AMRS</td><td>任务指令+状态</td><td>10-100Hz</td><td>TSN+ROS2</td></tr>
+        <tr><td class="td-highlight">ICD-03</td><td>BICS</td><td>ECLSS</td><td>生命支持控制</td><td>100-1000Hz</td><td>TSN CD域</td></tr>
+        <tr><td class="td-highlight">ICD-04</td><td>BICS</td><td>能源系统</td><td>功率调度</td><td>0.1-1Hz</td><td>TSN CT域</td></tr>
+        <tr><td class="td-highlight">ICD-05</td><td>MarsNet</td><td>IPN/DTN</td><td>星际数据</td><td>按链路窗口</td><td>HDTN</td></tr>
+        <tr><td class="td-highlight">ICD-06</td><td>AMRS</td><td>MarsNet</td><td>定位+通信</td><td>10-100Hz</td><td>60GHz+UWB</td></tr>
+        <tr><td class="td-highlight">ICD-07</td><td>BICS</td><td>MarsNav</td><td>导航服务</td><td>1-100Hz</td><td>TSN CT域</td></tr>
+        <tr><td class="td-highlight">ICD-08</td><td>安全子系统</td><td>全域</td><td>策略执行</td><td>事件驱动</td><td>ZTA引擎</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">B. 完整数据流 / Data Flow Architecture</h3>
+  <div class="diagram-wrap">
+    <svg class="diagram-svg" viewBox="0 0 860 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- Sensors -->
+      <rect x="10" y="60" width="140" height="80" rx="12" fill="rgba(34,197,94,0.15)" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="80" y="95" text-anchor="middle" fill="#22c55e" font-size="12" font-weight="700" font-family="Segoe UI">EMN Sensors</text>
+      <text x="80" y="115" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="9">10000+ 节点</text>
+      <!-- MarsNet -->
+      <rect x="190" y="60" width="140" height="80" rx="12" fill="rgba(20,184,166,0.15)" stroke="#14b8a6" stroke-width="1.5"/>
+      <text x="260" y="95" text-anchor="middle" fill="#14b8a6" font-size="12" font-weight="700" font-family="Segoe UI">MarsNet</text>
+      <text x="260" y="115" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="9">四域隔离 TSN</text>
+      <!-- BICS -->
+      <rect x="370" y="40" width="160" height="120" rx="12" fill="rgba(5,150,105,0.15)" stroke="#059669" stroke-width="1.5"/>
+      <text x="450" y="85" text-anchor="middle" fill="#059669" font-size="13" font-weight="700" font-family="Segoe UI">BICS</text>
+      <text x="450" y="105" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="9">数字孪生+AI</text>
+      <text x="450" y="125" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="9">决策引擎</text>
+      <!-- Actuators -->
+      <rect x="580" y="60" width="140" height="80" rx="12" fill="rgba(244,162,52,0.15)" stroke="#f4a234" stroke-width="1.5"/>
+      <text x="650" y="95" text-anchor="middle" fill="#f4a234" font-size="12" font-weight="700" font-family="Segoe UI">Actuators</text>
+      <text x="650" y="115" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="9">ECLSS+机器人</text>
+      <!-- DTN Gateway -->
+      <rect x="370" y="170" width="160" height="50" rx="10" fill="rgba(168,85,247,0.15)" stroke="#a855f7" stroke-width="1"/>
+      <text x="450" y="200" text-anchor="middle" fill="#a855f7" font-size="11" font-weight="700" font-family="Segoe UI">DTN → Earth</text>
+      <!-- Arrows -->
+      <path d="M155,100 L185,100" stroke="#22c55e" stroke-width="2" marker-end="url(#a1)"/>
+      <path d="M335,100 L365,100" stroke="#14b8a6" stroke-width="2" marker-end="url(#a2)"/>
+      <path d="M535,100 L575,100" stroke="#059669" stroke-width="2" marker-end="url(#a3)"/>
+      <path d="M450,165 L450,155" stroke="#a855f7" stroke-width="1.5" marker-end="url(#a4)"/>
+      <defs>
+        <marker id="a1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#22c55e"/></marker>
+        <marker id="a2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#14b8a6"/></marker>
+        <marker id="a3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#059669"/></marker>
+        <marker id="a4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#a855f7"/></marker>
+      </defs>
+      <!-- Labels -->
+      <text x="170" y="90" fill="var(--text-muted)" font-size="8" font-family="Segoe UI">raw</text>
+      <text x="350" y="90" fill="var(--text-muted)" font-size="8" font-family="Segoe UI">filtered</text>
+      <text x="555" y="90" fill="var(--text-muted)" font-size="8" font-family="Segoe UI">commands</text>
+    </svg>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- SECTION 13: Reliability -->
+<section id="reliability" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">Reliability</span>
+    <h2><span class="en">System Reliability</span><span class="zh">系统冗余性与可靠性</span></h2>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:1rem;">A. 三级可靠性 / Reliability Tiers (NASA-STD-8719.13C)</h3>
+  <div class="card-grid card-grid-3">
+    <div class="card card-red">
+      <div class="card-header"><div class="card-icon card-icon-red">🔴</div><div><span class="card-label label-red">CAT-1</span><h3>Safety Critical</h3><div class="zh-sub">安全关键</div></div></div>
+      <div class="card-body">R(10yr) ≥ <strong style="color:#ef4444;">0.9999</strong><br>TMR + 热备份<br>ECLSS、BICS核心、安全联锁</div>
+    </div>
+    <div class="card card-amber">
+      <div class="card-header"><div class="card-icon card-icon-amber">🟡</div><div><span class="card-label label-amber">CAT-2</span><h3>Mission Critical</h3><div class="zh-sub">任务关键</div></div></div>
+      <div class="card-body">R(10yr) ≥ <strong style="color:#f4a234;">0.999</strong><br>双冗余<br>机器人系统、ISRU、MarsNet</div>
+    </div>
+    <div class="card card-green">
+      <div class="card-header"><div class="card-icon card-icon-green">🟢</div><div><span class="card-label label-green">CAT-3</span><h3>Mission Support</h3><div class="zh-sub">任务支撑</div></div></div>
+      <div class="card-body">R(10yr) ≥ <strong style="color:#22c55e;">0.99</strong><br>单机+故障检测<br>科学研究、个人设备</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">B. MarsNet 降级层级 / Degradation Tiers</h3>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>层级</th><th>带宽</th><th>技术</th><th>覆盖</th><th>切换时间</th><th>触发条件</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight" style="color:#22c55e;">TIER-0</td><td class="td-val">10Gbps</td><td>TSN光纤+60GHz</td><td>全域全速</td><td>—</td><td>正常运行</td></tr>
+        <tr><td class="td-highlight" style="color:#14b8a6;">TIER-1</td><td class="td-val">10Gbps</td><td>备用光纤路径</td><td>全域</td><td class="td-val">&lt;500ms</td><td>主光纤中断</td></tr>
+        <tr><td class="td-highlight" style="color:#eab308;">TIER-2</td><td class="td-val">100Mbps</td><td>60GHz无线备用</td><td>CT+DT域</td><td class="td-val">&lt;5s</td><td>双光纤中断</td></tr>
+        <tr><td class="td-highlight" style="color:#f97316;">TIER-3</td><td class="td-val">~1Mbps</td><td>UHF+RS-485</td><td>仅ECLSS</td><td class="td-val">&lt;30s</td><td>严重降级</td></tr>
+        <tr><td class="td-highlight" style="color:#ef4444;">TIER-4</td><td class="td-val">~10kbps</td><td>硬接线铜缆</td><td>仅关键阀</td><td class="td-val">手动</td><td>极限生存</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- SECTION 14: Summary -->
+<section id="summary" class="container fade-section">
+  <div class="section-header">
+    <span class="section-tag">Summary</span>
+    <h2><span class="en">Engineering Parameter Summary</span><span class="zh">工程参数总表</span></h2>
+  </div>
+
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead><tr><th>子系统</th><th>核心参数</th><th>值</th><th>来源/依据</th></tr></thead>
+      <tbody>
+        <tr><td class="td-highlight">自治架构</td><td>4层响应时间</td><td class="td-val">&lt;10ms / &lt;1s / &lt;10s / 3-22min</td><td>设计基线</td></tr>
+        <tr><td class="td-highlight">EMN</td><td>THz-ISAC预警提前量</td><td class="td-val">2-3 hr</td><td>THz传播模型</td></tr>
+        <tr><td class="td-highlight">MAV</td><td>悬停功耗（火星）</td><td class="td-val">~802W (7.9× Earth)</td><td>ρ=0.020 kg/m³</td></tr>
+        <tr><td class="td-highlight">MarsNet</td><td>CD域时延</td><td class="td-val">&lt;500μs</td><td>IEEE 802.1Qbv</td></tr>
+        <tr><td class="td-highlight">MarsNet</td><td>TSN时延抖动</td><td class="td-val">&lt;10μs</td><td>IEEE 802.1AS</td></tr>
+        <tr><td class="td-highlight">MarsNet</td><td>60GHz O₂吸收</td><td class="td-val" style="color:#22c55e;">无（CO₂大气）</td><td>火星大气成分</td></tr>
+        <tr><td class="td-highlight">BICS</td><td>算力（L3）</td><td class="td-val">~100 TOPS</td><td>Rad-hard GPU 2030+</td></tr>
+        <tr><td class="td-highlight">IPN</td><td>最差数据率</td><td class="td-val">~9.5 Mbps</td><td>Link budget calc</td></tr>
+        <tr><td class="td-highlight">IPN</td><td>合日中断</td><td class="td-val">~14天</td><td>轨道力学</td></tr>
+        <tr><td class="td-highlight">UWB</td><td>定位精度</td><td class="td-val">±0.1m (3D)</td><td>TWR测距</td></tr>
+        <tr><td class="td-highlight">CAT-1</td><td>可靠性目标</td><td class="td-val">R(10yr) ≥ 0.9999</td><td>NASA-STD-8719.13C</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card card-green" style="margin-top:2rem;">
+    <div class="card-body" style="font-size:1rem;text-align:center;line-height:1.8;">
+      <strong style="color:var(--aux-teal);font-size:1.2rem;">EMN（感知）+ BICS（思考）+ Robots（执行）+ DTN（通信）= 自主神经系统</strong><br>
+      <span style="color:var(--text-secondary);">这不是地球工业互联网的火星版，这是在物理约束方程倒推出来的生存架构。</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <div class="container">
+    <p class="footer-text">火星基地阿尔法 · 辅助系统及互联网络 · Section 3.4<br>基于第一性原理设计，所有参数标注来源与置信度</p>
+  </div>
+</footer>
+
+<!-- BILINGUAL + ANIMATION JS -->
+<script>
+// ===== Bilingual Translation System =====
+(function(){
+
+var EN_MAP = {
+  '.nav-logo .nav-logo-zh': 'Mars Base Alpha',
+  '.nav-links .nav-link:nth-child(1)': '⚡ Energy Supply',
+  '.nav-links .nav-link:nth-child(2)': '📡 Communication',
+  '.nav-links .nav-link:nth-child(3)': '🏗️ Materials',
+  '.nav-links .nav-link:nth-child(4)': '🔗 Auxiliary',
+  '.btn-back': '← Back to Home',
+  '#hero .hero-badge': 'Section 3.4 · Auxiliary Systems & Network',
+  '#hero .hero-title .hero-title-zh': 'Auxiliary Systems & Network · Four-Layer Autonomous Pyramid',
+  '#hero .hero-subtitle': 'The engineering essence of Mars base auxiliary systems is not a simple transplant of Earth’s industrial internet, but building a closed-loop intelligent system capable of fully autonomous perception, decision, and execution under four boundary conditions: 3-22min communication delay, no GPS infrastructure, continuous GCR radiation bombardment, and extremely limited energy. Every sensor selection, every network protocol stack, every robot control logic must meet the minimum design standard of ‘perfect operation for 14 days with complete Earth disconnection’.',
+  '#hero .stat-item:nth-child(1) .stat-label': 'Autonomy Layers',
+  '#hero .stat-item:nth-child(2) .stat-label': 'Comm Delay',
+  '#hero .stat-item:nth-child(3) .stat-label': 'Sensor Nodes',
+  '#hero .stat-item:nth-child(4) .stat-label': 'Robot Classes',
+  '#hero .stat-item:nth-child(5) .stat-label': 'Full Autonomy',
+  '#architecture .section-header p': 'Axiom: Single-layer failure → lower layer must sustain survival; Dual-layer failure → L1 must guarantee life support',
+  '#architecture .diagram-svg text:nth-of-type(3)': 'L4 · Cross-Planetary',
+  '#architecture .diagram-svg text:nth-of-type(5)': 'Cross-Planetary Decision · 3-22min',
+  '#architecture .diagram-svg text:nth-of-type(8)': 'L3 · Base Autonomous',
+  '#architecture .diagram-svg text:nth-of-type(10)': 'Base Autonomous Planning · <10s',
+  '#architecture .diagram-svg text:nth-of-type(13)': 'L2 · Sub-system Coord',
+  '#architecture .diagram-svg text:nth-of-type(15)': 'Sub-system Coordination · <1s',
+  '#architecture .diagram-svg text:nth-of-type(18)': 'L1 · Hard Real-time',
+  '#architecture .diagram-svg text:nth-of-type(20)': 'Hard Real-time Execution · <10ms',
+  '#architecture .diagram-svg text:nth-of-type(24)': 'Mission Planning',
+  '#architecture .diagram-svg text:nth-of-type(25)': 'Emergency Response',
+  '#architecture .diagram-svg text:nth-of-type(26)': 'Multi-robot Task',
+  '#architecture .diagram-svg text:nth-of-type(27)': 'Life Support',
+  '#architecture .card-grid-4 .card:nth-child(1) h3': 'Cross-Planetary',
+  '#architecture .card-grid-4 .card:nth-child(1) .zh-sub': 'Cross-Planetary Decision Layer',
+  '#architecture .card-grid-4 .card:nth-child(1) .card-body': 'Earth expert system provides strategic guidance via DTN link, 3-22min one-way delay. Mission planning, science priorities, resource allocation strategy.',
+  '#architecture .card-grid-4 .card:nth-child(1) .metric:nth-child(1) .metric-label': 'Resp. Delay',
+  '#architecture .card-grid-4 .card:nth-child(1) .metric:nth-child(2) .metric-label': 'Protocol',
+  '#architecture .card-grid-4 .card:nth-child(2) h3': 'Base Autonomous',
+  '#architecture .card-grid-4 .card:nth-child(2) .zh-sub': 'Base Autonomous Planning',
+  '#architecture .card-grid-4 .card:nth-child(2) .card-body': 'Digital twin + LLM inference engine, emergency response <10s. Independently complete all decisions during Earth disconnection, including dust storm response and equipment fault diagnosis.',
+  '#architecture .card-grid-4 .card:nth-child(2) .metric:nth-child(1) .metric-label': 'Resp. Delay',
+  '#architecture .card-grid-4 .card:nth-child(2) .metric:nth-child(2) .metric-label': 'Tech Stack',
+  '#architecture .card-grid-4 .card:nth-child(3) h3': 'Sub-system Coord',
+  '#architecture .card-grid-4 .card:nth-child(3) .zh-sub': 'Sub-system Coordination',
+  '#architecture .card-grid-4 .card:nth-child(3) .card-body': 'Sensor fusion, robot task scheduling, ISRU production management. Multi-robot cooperation uses decentralized auction algorithm, <1s for reallocation.',
+  '#architecture .card-grid-4 .card:nth-child(3) .metric:nth-child(1) .metric-label': 'Resp. Delay',
+  '#architecture .card-grid-4 .card:nth-child(3) .metric:nth-child(2) .metric-label': 'Network',
+  '#architecture .card-grid-4 .card:nth-child(4) h3': 'Hard Real-time',
+  '#architecture .card-grid-4 .card:nth-child(4) .zh-sub': 'Hard Real-time Execution',
+  '#architecture .card-grid-4 .card:nth-child(4) .card-body': 'PLC/FPGA directly drives actuators, safety interlock <10ms. ECLSS valve control, pressure release, fire suppression — undelayable life support.',
+  '#architecture .card-grid-4 .card:nth-child(4) .metric:nth-child(1) .metric-label': 'Resp. Delay',
+  '#architecture .card-grid-4 .card:nth-child(4) .metric:nth-child(2) .metric-label': 'Hardware',
+  '#emn h3:nth-of-type(1)': 'A. MEDA Engineering Baseline',
+  '#emn .data-table-wrap:first-of-type .data-table thead tr': '<th>Sensor</th><th>Parameter</th><th>Range</th><th>Accuracy</th><th>Rate</th><th>Power</th>',
+  '#emn .data-table-wrap:first-of-type .data-table tbody tr:nth-child(1) td.td-highlight': 'Wind Speed/Dir',
+  '#emn .data-table-wrap:first-of-type .data-table tbody tr:nth-child(2) td.td-highlight': 'Air Temperature',
+  '#emn .data-table-wrap:first-of-type .data-table tbody tr:nth-child(3) td.td-highlight': 'Ground Temp',
+  '#emn .data-table-wrap:first-of-type .data-table tbody tr:nth-child(4) td.td-highlight': 'Pressure',
+  '#emn .data-table-wrap:first-of-type .data-table tbody tr:nth-child(5) td.td-highlight': 'Relative Humidity',
+  '#emn .data-table-wrap:first-of-type .data-table tbody tr:nth-child(6) td.td-highlight': 'UV Index',
+  '#emn .data-table-wrap:first-of-type .data-table tbody tr:nth-child(7) td.td-highlight': 'Dust AOD',
+  '#emn h3:nth-of-type(2)': 'B. MarsMon Three-Layer Architecture',
+  '#emn .card-grid-3 .card:nth-child(1) h3': 'Outer Monitoring',
+  '#emn .card-grid-3 .card:nth-child(1) .zh-sub': 'Outer · 5km Radius',
+  '#emn .card-grid-3 .card:nth-child(1) .card-body': 'Weather station array, THz-ISAC dust storm detection nodes, seismometer network. 5km radius environment situational awareness.',
+  '#emn .card-grid-3 .card:nth-child(2) h3': 'Perimeter Monitoring',
+  '#emn .card-grid-3 .card:nth-child(2) .zh-sub': 'Perimeter · 0-100m',
+  '#emn .card-grid-3 .card:nth-child(2) .card-body': 'Radiation monitoring nodes, dust accumulation sensors, thermal imaging cameras, micrometeorite impact detectors. Real-time habitat shell health monitoring.',
+  '#emn .card-grid-3 .card:nth-child(3) h3': 'Interior Monitoring',
+  '#emn .card-grid-3 .card:nth-child(3) .zh-sub': 'Interior · ECLSS+Habitat',
+  '#emn .card-grid-3 .card:nth-child(3) .card-body': 'ECLSS sensors (O₂/CO₂/pressure/temp/humidity), acoustic leak detection, personnel wearable vital signs monitoring. Life support closed-loop core.',
+  '#emn h3:nth-of-type(3)': 'C. THz-ISAC Dust Storm Detection',
+  '#emn .data-table-wrap:nth-of-type(2) .data-table thead tr': '<th>Level</th><th>AOD Range</th><th>Meaning</th><th>Auto Response</th>',
+  '#emn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(1) td:nth-child(3)': 'Clear atmosphere, normal operations',
+  '#emn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(1) td:nth-child(4)': 'None',
+  '#emn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(2) td:nth-child(3)': 'Light dust, visibility reduced',
+  '#emn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(2) td:nth-child(4)': 'OMR recall, solar panel pre-clean',
+  '#emn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(3) td:nth-child(3)': 'Moderate dust storm, solar power drops',
+  '#emn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(3) td:nth-child(4)': 'All outdoor robots recall, battery switch',
+  '#emn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(4) td:nth-child(3)': 'Global dust storm, survival mode',
+  '#emn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(4) td:nth-child(4)': 'BICS full takeover, minimum power',
+  '#emn h3:nth-of-type(4)': 'D. Radiation Monitoring',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table thead tr': '<th>Detector</th><th>Measurement</th><th>Power</th><th>Feature</th>',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(1) td.td-highlight': 'SSLTD',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(1) td:nth-child(2)': 'γ/neutron dose rate',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(1) td:nth-child(4)': 'Real-time readout, high sensitivity',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(2) td.td-highlight': 'TLD',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(2) td:nth-child(2)': 'Cumulative dose',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(2) td:nth-child(4)': 'Passive accumulation, periodic readout',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(3) td.td-highlight': 'Si PIN',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(3) td:nth-child(2)': 'Charged particle spectrum',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(3) td:nth-child(4)': 'Strong particle identification',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(4) td.td-highlight': '³He Tube',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(4) td:nth-child(2)': 'Thermal neutron flux',
+  '#emn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(4) td:nth-child(4)': 'GCR secondary neutron monitoring',
+  '#emn > p': 'Kriging interpolation generates 2D dose rate distribution, 1 Sol update cycle, 1m×1m resolution. Used to mark occupancy restriction and insufficient shielding zones.',
+  '#robots .card:first-of-type h3': 'ARMADAS Paradigm',
+  '#robots .card:first-of-type .zh-sub': 'Standard Voxels + Assemblers → Self-build/Repair/Reconfigure',
+  '#robots .card:first-of-type .card-body': 'ARMADAS: decompose base structures into standardized voxel units, assembled/disassembled/reconfigured by dedicated assembler robots. Repair = replace damaged voxels + reassemble; Expansion = manufacture new voxels + assemble; Reconfiguration = dismantle old-area voxels + assemble new area. Material closed-loop: Mars soil → voxel → structure → recycle → remanufacture.',
+  '#robots h3:nth-of-type(2)': 'Five Robot Classes',
+  '#robots .data-table-wrap:first-of-type .data-table thead tr': '<th>Class</th><th>Name</th><th>Scenario</th><th>Key Specs</th><th>Navigation</th><th>Power</th>',
+  '#robots .data-table-wrap:first-of-type .data-table tbody tr:nth-child(1) td:nth-child(3)': 'Indoor Fixed Ops',
+  '#robots .data-table-wrap:first-of-type .data-table tbody tr:nth-child(2) td:nth-child(3)': 'Indoor Mobile',
+  '#robots .data-table-wrap:first-of-type .data-table tbody tr:nth-child(3) td:nth-child(3)': 'Outdoor Maintenance',
+  '#robots .data-table-wrap:first-of-type .data-table tbody tr:nth-child(4) td:nth-child(3)': 'Aerial Recon.',
+  '#robots .data-table-wrap:first-of-type .data-table tbody tr:nth-child(5) td:nth-child(3)': 'Heavy ISRU Mining',
+  '#robots h3:nth-of-type(3)': 'MAV Aerodynamic Challenge',
+  '#robots h3:nth-of-type(4)': 'Multi-Robot Coordination',
+  '#robots h3:nth-of-type(5)': 'Auto-Trigger Matrix',
+  '#marsnet h3:nth-of-type(1)': 'A. Why Not Wi-Fi',
+  '#marsnet h3:nth-of-type(2)': 'B. Four-Domain Isolation',
+  '#marsnet h3:nth-of-type(3)': 'C. MarsNet 7-Layer Protocol Stack',
+  '#marsnet h3:nth-of-type(4)': 'D. Time-Sensitive Networking (TSN)',
+  '#marsnet h4:nth-of-type(1)': '1ms TSN Superframe Structure',
+  '#marsnet h3:nth-of-type(5)': 'E. 60GHz mmWave Indoor Wireless',
+  '#marsnet h3:nth-of-type(6)': 'F. UWB Precise Positioning',
+  '#bics h3:nth-of-type(1)': 'A. Digital Twin Components (CMU 2024)',
+  '#bics h3:nth-of-type(2)': 'B. Computing Hardware',
+  '#bics h3:nth-of-type(3)': 'C. Triple Modular Redundancy',
+  '#bics h3:nth-of-type(4)': 'D. BICS Layered AI Decision Engine',
+  '#bics h3:nth-of-type(5)': 'E. Emergency Decision Matrix',
+  '#ipn h3:nth-of-type(1)': 'A. Mars-Earth Communication Constraints',
+  '#ipn h3:nth-of-type(2)': 'B. Link Budget',
+  '#ipn h3:nth-of-type(3)': 'C. NASA HDTN Protocol',
+  '#ipn h3:nth-of-type(4)': 'D. Solar Conjunction Survival',
+  '#ipn h3:nth-of-type(5)': 'E. Relay Constellation',
+  '#security h3:nth-of-type(1)': 'A. Threat Model',
+  '#security h3:nth-of-type(2)': 'B. Zero Trust Architecture (NIST SP 800-207)',
+  '#security h3:nth-of-type(3)': 'C. Dead Man’s Switch Dual Verification',
+  '#urs h3:nth-of-type(1)': 'A. Unified Resource Scheduler',
+  '#urs h3:nth-of-type(2)': 'B. Dust Storm Complete Timeline',
+  '#marsnav h3:nth-of-type(1)': 'A. Mars Time System',
+  '#marsnav h3:nth-of-type(2)': 'B. MarsNav Positioning Tiers',
+  '#hmi h3:nth-of-type(1)': 'A. CAIDS Information Pipeline',
+  '#hmi h3:nth-of-type(2)': 'B. NLQI Natural Language Query',
+  '#integration h3:nth-of-type(1)': 'A. Interface Control Matrix',
+  '#integration h3:nth-of-type(2)': 'B. Data Flow Architecture',
+  '#reliability h3:nth-of-type(1)': 'A. Reliability Tiers (NASA-STD-8719.13C)',
+  '#reliability h3:nth-of-type(2)': 'B. MarsNet Degradation Tiers',
+  '#summary .card.card-green .card-body': '<strong style="color:var(--aux-teal);font-size:1.2rem;">EMN (Perception) + BICS (Thinking) + Robots (Execution) + DTN (Communication) = Autonomous Nervous System</strong><br><span style="color:var(--text-secondary);">This is not Earth’s industrial internet ported to Mars; this is a survival architecture derived from physical constraint equations.</span>',
+  '#footer .footer-text': 'Mars Base Alpha · Auxiliary Systems & Network · Section 3.4<br>First-principles design, all parameters with sources and confidence levels',
+  '#marsnet .card-grid-3:first-of-type .card:nth-child(1) h3': 'Deterministic Latency',
+  '#marsnet .card-grid-3:first-of-type .card:nth-child(1) .zh-sub': 'Deterministic Latency',
+  '#marsnet .card-grid-3:first-of-type .card:nth-child(1) .card-body': 'Wi-Fi CSMA/CA is inherently contention-based, with delay jitter up to tens of ms. ECLSS valve control requires <500μs deterministic latency; Wi-Fi cannot meet this.',
+  '#marsnet .card-grid-3:first-of-type .card:nth-child(2) h3': 'Radiation SEU',
+  '#marsnet .card-grid-3:first-of-type .card:nth-child(2) .zh-sub': 'Single Event Upset',
+  '#marsnet .card-grid-3:first-of-type .card:nth-child(2) .card-body': 'GCR 240mSv/yr continuous bombardment. Consumer-grade Wi-Fi chips have no radiation-hardened design; SEU rate far exceeds industrial TSN switches. Critical domains must use rad-hard wired links.',
+  '#marsnet .card-grid-3:first-of-type .card:nth-child(3) h3': 'Spectrum Interference',
+  '#marsnet .card-grid-3:first-of-type .card:nth-child(3) .zh-sub': 'Spectrum Interference',
+  '#marsnet .card-grid-3:first-of-type .card:nth-child(3) .card-body': '2.4/5GHz ISM band has severe multipath effects in enclosed metal cabins. 5 robot classes + personnel devices simultaneously accessing causes uncontrollable interference. Cannot do domain isolation.',
+  '#marsnet .card.card-green .card-body': '<strong style="color:var(--aux-teal);">Key Finding:</strong> On Earth, 60GHz band has severe O₂ absorption peak (~15dB/km attenuation), but on Mars, the atmosphere is 95.3% CO₂ with virtually no O₂, so <strong style="color:var(--aux-green);">60GHz has no O₂ absorption peak on Mars!</strong> This means Mars 60GHz link quality far exceeds Earth’s same band, making it the optimal choice for CT domain wireless access.',
+  '#bics .card-grid-4 .card:nth-child(1) .card-body': 'All physical entities of Mars base: habitats, ECLSS, energy equipment, robots, sensor networks.',
+  '#bics .card-grid-4 .card:nth-child(1) .zh-sub': 'Physical Assets',
+  '#bics .card-grid-4 .card:nth-child(2) .card-body': 'High-fidelity simulation models of physical assets, including multi-physics coupling of thermodynamics, structural mechanics, and fluid dynamics.',
+  '#bics .card-grid-4 .card:nth-child(2) .zh-sub': 'Digital Model',
+  '#bics .card-grid-4 .card:nth-child(3) .card-body': 'MarsNet real-time data stream: 10000+ sensors → 100:1 compression → anomaly filtering → context fusion → 10 key indicators.',
+  '#bics .card-grid-4 .card:nth-child(3) .zh-sub': 'Data Connection',
+  '#bics .card-grid-4 .card:nth-child(4) .card-body': 'Predictive maintenance, emergency simulation, resource optimization, NLQI natural language query. Core of AI decision engine.',
+  '#bics .card-grid-4 .card:nth-child(4) .zh-sub': 'Intelligent Services',
+  '#bics .card.card-green .card-body': '<strong style="color:var(--aux-teal);">Active</strong> (running) + <strong style="color:var(--aux-green);">Hot Standby</strong> (<1s switchover) + <strong style="color:var(--mars-amber);">Warm Standby</strong> (<10s switchover) → <strong style="color:var(--text-primary);">Majority Voter</strong><br><br>Any single-point failure is automatically masked by majority voting; hot standby seamlessly takes over. CAT-1 safety-critical systems (ECLSS, BICS core) require mandatory TMR configuration.',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table thead tr': '<th>Scenario</th><th>Detection Source</th><th>BICS Decision</th><th>Response Layer</th><th>Time Limit</th>',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(1) td:nth-child(1)': 'Habitat Leak',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(1) td:nth-child(2)': 'Pressure drop + Acoustic',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(1) td:nth-child(3)': 'Isolate segment + Pressurize + EVA seal',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(1) td:nth-child(4)': 'L1',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(2) td:nth-child(1)': 'CO₂ > 1%',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(2) td:nth-child(2)': 'ECLSS Sensors',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(2) td:nth-child(3)': 'Increase purification + Transfer crew + Restrict activity',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(2) td:nth-child(4)': 'L1',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(3) td:nth-child(1)': 'Radiation Spike',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(3) td:nth-child(2)': 'SSLTD + TLD',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(3) td:nth-child(3)': 'Crew to shielded area + Restrict EVA',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(3) td:nth-child(4)': 'L2',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(4) td:nth-child(1)': 'Main Power Failure',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(4) td:nth-child(2)': 'Power Monitor',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(4) td:nth-child(3)': 'Switch backup + Shed non-critical loads',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(4) td:nth-child(4)': 'L1',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(5) td:nth-child(1)': 'Dust Storm RED',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(5) td:nth-child(2)': 'THz-ISAC',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(5) td:nth-child(3)': 'Full recall + Minimum power + Battery switch',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(5) td:nth-child(4)': 'L3',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(6) td:nth-child(1)': 'Robot Swarm Failure',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(6) td:nth-child(2)': 'Heartbeat Timeout',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(6) td:nth-child(3)': 'Re-auction allocation + Enable redundancy',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(6) td:nth-child(4)': 'L2',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(7) td:nth-child(1)': 'Comm. Disruption',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(7) td:nth-child(2)': 'DTN Timeout',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(7) td:nth-child(3)': 'BICS full autonomy + Periodic reconnect',
+  '#bics .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(7) td:nth-child(4)': 'L3→L4',
+  '#ipn .card-grid-2:first-of-type .card:nth-child(1) h3': 'Transmitter',
+  '#ipn .card-grid-2:first-of-type .card:nth-child(2) h3': 'Receiver',
+  '#ipn .card.card-emerald .card-body': '<strong style="color:var(--aux-teal);">Data Rate Estimate:</strong><br>Worst case (farthest): <strong style="color:var(--text-primary);">~9.5 Mbps</strong><br>Best case (closest): <strong style="color:var(--text-primary);">~513 Mbps</strong><br>Typical: ~50-100 Mbps (sufficient for HDTN data transfer + science data return)',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table thead tr': '<th>Feature</th><th>HDTN</th><th>DTN (BPv7)</th><th>TCP/IP</th>',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(1) td:nth-child(1)': 'Delay Tolerance',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(1) td:nth-child(2)': '✓ Unlimited delay',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(1) td:nth-child(3)': '✓ Hours-level',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(1) td:nth-child(4)': '✗ Minutes max',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(2) td:nth-child(1)': 'Multi-path',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(2) td:nth-child(2)': '✓ Concurrent transfer',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(2) td:nth-child(3)': 'Single path',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(2) td:nth-child(4)': 'Single path',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(3) td:nth-child(1)': 'Security',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(3) td:nth-child(2)': '✓ BPSec built-in',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(3) td:nth-child(3)': 'Optional',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(3) td:nth-child(4)': 'TLS',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(4) td:nth-child(1)': 'Store-and-Forward',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(4) td:nth-child(2)': '✓ Custody',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(4) td:nth-child(3)': '✓',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(4) td:nth-child(4)': '✗',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(5) td:nth-child(1)': 'Conjunction Survival',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(5) td:nth-child(2)': '✓ Auto pause/resume',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(5) td:nth-child(3)': '✓',
+  '#ipn .data-table-wrap:nth-of-type(2) .data-table tbody tr:nth-child(5) td:nth-child(4)': '✗ Connection drops',
+  '#ipn .timeline-item:nth-child(1) .timeline-time': 'T-30 days',
+  '#ipn .timeline-item:nth-child(1) .timeline-content h4': 'Preparation Phase',
+  '#ipn .timeline-item:nth-child(1) .timeline-content p': 'Upload 30-day autonomous plan, BICS loads complete task sequence. All software updates frozen. Verify energy storage sufficiency.',
+  '#ipn .timeline-item:nth-child(2) .timeline-time': 'T-14 days',
+  '#ipn .timeline-item:nth-child(2) .timeline-content h4': 'Degradation Start',
+  '#ipn .timeline-item:nth-child(2) .timeline-content p': 'Non-critical science experiments paused. DTN enables store-and-forward mode, all data cached locally. BICS switches to L3 full autonomous mode.',
+  '#ipn .timeline-item:nth-child(3) .timeline-time': 'T-0 (Conjunction)',
+  '#ipn .timeline-item:nth-child(3) .timeline-content h4': 'Total Blackout',
+  '#ipn .timeline-item:nth-child(3) .timeline-content p': 'Uplink/downlink completely severed. BICS independently runs all decisions. Robots execute pre-programmed maintenance tasks.',
+  '#ipn .timeline-item:nth-child(4) .timeline-time': 'T+14 days',
+  '#ipn .timeline-item:nth-child(4) .timeline-content h4': 'Link Recovery',
+  '#ipn .timeline-item:nth-child(4) .timeline-content p': 'DTN auto-reconnect. Batch send cached data. BICS uploads 14-day operations report. Earth team evaluates then restores L4 control.',
+  '#ipn .data-table-wrap:nth-of-type(3) .data-table thead tr': '<th>Option</th><th>Orbit</th><th>Satellites</th><th>Coverage</th><th>Assessment</th>',
+  '#ipn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(1) td:nth-child(1)': 'Option A',
+  '#ipn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(1) td:nth-child(5)': 'Low cost, poor coverage',
+  '#ipn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(2) td:nth-child(1)': 'Option B ★',
+  '#ipn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(2) td:nth-child(5)': 'Recommended baseline',
+  '#ipn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(3) td:nth-child(1)': 'Option C',
+  '#ipn .data-table-wrap:nth-of-type(3) .data-table tbody tr:nth-child(3) td:nth-child(5)': 'High redundancy, high cost',
+  '#security .data-table-wrap:first-of-type .data-table thead tr': '<th>ID</th><th>Threat</th><th>Source</th><th>Impact</th><th>Mitigation</th>',
+  '#security .data-table-wrap:first-of-type .data-table tbody tr:nth-child(1) td:nth-child(1)': 'T1',
+  '#security .data-table-wrap:first-of-type .data-table tbody tr:nth-child(1) td:nth-child(2)': 'GCR Single Event Upset',
+  '#security .data-table-wrap:first-of-type .data-table tbody tr:nth-child(2) td:nth-child(1)': 'T2',
+  '#security .data-table-wrap:first-of-type .data-table tbody tr:nth-child(2) td:nth-child(2)': 'Malicious Earth Command',
+  '#security .data-table-wrap:first-of-type .data-table tbody tr:nth-child(3) td:nth-child(1)': 'T3',
+  '#security .data-table-wrap:first-of-type .data-table tbody tr:nth-child(3) td:nth-child(2)': 'Internal Fault/Misoperation',
+  '#security .data-table-wrap:first-of-type .data-table tbody tr:nth-child(4) td:nth-child(1)': 'T4',
+  '#security .data-table-wrap:first-of-type .data-table tbody tr:nth-child(4) td:nth-child(2)': 'DTN Relay Hijack',
+  '#security .data-table-wrap:first-of-type .data-table tbody tr:nth-child(5) td:nth-child(1)': 'T5',
+  '#security .data-table-wrap:first-of-type .data-table tbody tr:nth-child(5) td:nth-child(2)': 'Robot Channel Jamming',
+  '#security .card.card-green:first-of-type .card-body': '<strong style="color:var(--aux-teal);">“Never trust, always verify”</strong><br><span style="color:var(--text-secondary);">Never trust, always verify — even commands from Earth</span>',
+  '#security .timeline-item:nth-child(1) .timeline-time': 'Step 1 · Earth → Mars',
+  '#security .timeline-item:nth-child(1) .timeline-content h4': 'BPSec Signature + HDTN Encryption',
+  '#security .timeline-item:nth-child(1) .timeline-content p': 'Earth DSN sends command, BPSec end-to-end signed, HDTN encrypted. Prevents relay hijacking.',
+  '#security .timeline-item:nth-child(2) .timeline-time': 'Step 2 · Mars HDTN',
+  '#security .timeline-item:nth-child(2) .timeline-content h4': 'Verify BPSec Signature',
+  '#security .timeline-item:nth-child(2) .timeline-content p': 'Mars HDTN gateway verifies signature integrity. Signature mismatch → discard + alert.',
+  '#security .timeline-item:nth-child(3) .timeline-time': 'Step 3 · BICS Semantic Compliance',
+  '#security .timeline-item:nth-child(3) .timeline-content h4': 'Semantic Check + Digital Twin Pre-simulation',
+  '#security .timeline-item:nth-child(3) .timeline-content p': 'BICS AI engine checks if command violates safety rules. Digital twin pre-simulates execution consequences.',
+  '#security .timeline-item:nth-child(4) .timeline-time': 'Step 4 · Execute/Reject',
+  '#security .timeline-item:nth-child(4) .timeline-content h4': 'Safe → Execute, Unsafe → Reject',
+  '#security .timeline-item:nth-child(4) .timeline-content p': 'Passes all checks → execute. Any check fails → reject execution, await Earth secondary confirmation.',
+  '#security .timeline-item:nth-child(5) .timeline-time': 'Step 5 · High-Risk Secondary Confirmation',
+  '#security .timeline-item:nth-child(5) .timeline-content h4': 'Earth Secondary Confirmation (25-45min round-trip)',
+  '#security .timeline-item:nth-child(5) .timeline-content p': 'High-risk operations must await Earth secondary confirmation. 25-45min round-trip is the safety cost.',
+  '#urs .data-table-wrap:first-of-type .data-table thead tr': '<th>Priority</th><th>Category</th><th>Typical Power</th><th>Bandwidth Guarantee</th><th>Compute Allocation</th>',
+  '#urs .timeline-item:nth-child(1) .timeline-time': 'T-3hr · THz-ISAC First Detection',
+  '#urs .timeline-item:nth-child(1) .timeline-content h4': 'EMN: THz-ISAC detects AOD rising trend, issues YELLOW alert',
+  '#urs .timeline-item:nth-child(2) .timeline-time': 'T-2hr · ORANGE Alert',
+  '#urs .timeline-item:nth-child(2) .timeline-content h4': 'EMN: AOD≥0.5, upgrade to ORANGE',
+  '#urs .timeline-item:nth-child(3) .timeline-time': 'T-1hr · Pre-switch',
+  '#urs .timeline-item:nth-child(3) .timeline-content h4': 'EMN: AOD continues rising, prepare for RED',
+  '#urs .timeline-item:nth-child(4) .timeline-time': 'T+0 · RED Dust Storm',
+  '#urs .timeline-item:nth-child(4) .timeline-content h4': 'EMN: AOD≥2.0, RED global dust storm',
+  '#urs .timeline-item:nth-child(5) .timeline-time': 'T+30d · Dust Storm Subsiding',
+  '#urs .timeline-item:nth-child(5) .timeline-content h4': 'EMN: AOD drops below 0.5, downgrade ORANGE→YELLOW',
+  '#marsnav .card-grid-4 .card:nth-child(1) h3': 'Indoor',
+  '#marsnav .card-grid-4 .card:nth-child(1) .zh-sub': 'Indoor',
+  '#marsnav .card-grid-4 .card:nth-child(2) h3': 'Near-field',
+  '#marsnav .card-grid-4 .card:nth-child(2) .zh-sub': '≤1km',
+  '#marsnav .card-grid-4 .card:nth-child(3) h3': 'Far-field',
+  '#marsnav .card-grid-4 .card:nth-child(3) .zh-sub': '>1km',
+  '#marsnav .card-grid-4 .card:nth-child(4) h3': 'Absolute',
+  '#marsnav .card-grid-4 .card:nth-child(4) .zh-sub': 'Absolute',
+  '#hmi .dialogue-line:nth-child(1) .dialogue-text': '<span class="speaker">Astronaut</span>BICS, what are the top 3 concerns for the base right now?',
+  '#hmi .dialogue-line:nth-child(2) .dialogue-text': '<span class="speaker">BICS-NLQI</span>Current Top-3 concerns:<br><strong style="color:#ef4444;">1. ECLSS CO₂ Scrubber-2 efficiency down 12%</strong> (current 1.2% CO₂, threshold 1.0%) — MSR-7 scheduled for filter replacement<br><strong style="color:#eab308;">2. Solar Panel Zone C dust AOD=0.35</strong> (power down 18%) — OMR-3 scheduled 14:00 cleaning<br><strong style="color:#22c55e;">3. DSN link window 10:30-14:45 MTC</strong> (4h15min available, 2.1GB pending)',
+  '#reliability .card-grid-3 .card:nth-child(1) .card-body': 'R(10yr) ≥ <strong style="color:#ef4444;">0.9999</strong><br>TMR + Hot Standby<br>ECLSS, BICS Core, Safety Interlock',
+  '#reliability .card-grid-3 .card:nth-child(1) .zh-sub': 'Safety Critical',
+  '#reliability .card-grid-3 .card:nth-child(2) .card-body': 'R(10yr) ≥ <strong style="color:#f4a234;">0.999</strong><br>Dual Redundancy<br>Robot Systems, ISRU, MarsNet',
+  '#reliability .card-grid-3 .card:nth-child(2) .zh-sub': 'Mission Critical',
+  '#reliability .card-grid-3 .card:nth-child(3) .card-body': 'R(10yr) ≥ <strong style="color:#22c55e;">0.99</strong><br>Single + Fault Detection<br>Science Research, Personal Devices',
+  '#reliability .card-grid-3 .card:nth-child(3) .zh-sub': 'Mission Support',
+  '#reliability .data-table-wrap .data-table thead tr': '<th>Tier</th><th>Bandwidth</th><th>Technology</th><th>Coverage</th><th>Switchover</th><th>Trigger</th>'
+};
+
+var currentLang = localStorage.getItem('aux-lang') || 'zh';
+var origCache = {};
+
+function setLanguage(lang) {
+  if (lang === currentLang) return;
+  
+  if (lang === 'en') {
+    // Save original Chinese content and apply English
+    Object.keys(EN_MAP).forEach(function(sel) {
+      try {
+        var el = document.querySelector(sel);
+        if (el) {
+          origCache[sel] = el.innerHTML;
+          el.innerHTML = EN_MAP[sel];
+        }
+      } catch(e) {}
+    });
+    // Toggle CSS-based zh/en spans
+    document.documentElement.classList.add('lang-en');
+    document.documentElement.classList.remove('lang-zh');
+  } else {
+    // Restore original Chinese content
+    Object.keys(origCache).forEach(function(sel) {
+      try {
+        var el = document.querySelector(sel);
+        if (el) {
+          el.innerHTML = origCache[sel];
+        }
+      } catch(e) {}
+    });
+    origCache = {};
+    document.documentElement.classList.remove('lang-en');
+    document.documentElement.classList.add('lang-zh');
+  }
+  
+  currentLang = lang;
+  localStorage.setItem('aux-lang', lang);
+  
+  // Update toggle button text
+  var btn = document.getElementById('lang-toggle');
+  if (btn) {
+    btn.textContent = lang === 'zh' ? 'EN' : '中文';
+  }
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+  // Create language toggle button
+  var nav = document.querySelector('.nav-links');
+  if (nav) {
+    var btn = document.createElement('button');
+    btn.id = 'lang-toggle';
+    btn.textContent = currentLang === 'zh' ? 'EN' : '中文';
+    btn.style.cssText = 'background:var(--aux-green);color:#fff;border:none;padding:6px 16px;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.85rem;transition:all 0.3s;';
+    btn.addEventListener('click', function() {
+      setLanguage(currentLang === 'zh' ? 'en' : 'zh');
+    });
+    nav.appendChild(btn);
+  }
+  
+  // Apply saved language preference
+  if (currentLang === 'en') {
+    setLanguage('en');
+  }
+});
+
+// ===== Intersection Observer for fade-in =====
+document.addEventListener('DOMContentLoaded', function() {
+  var sections = document.querySelectorAll('.fade-section');
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    sections.forEach(function(s) { observer.observe(s); });
+  } else {
+    sections.forEach(function(s) { s.classList.add('visible'); });
+  }
+});
+
+// ===== Smooth scroll for nav links =====
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.nav-link[href^="#"]').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var target = document.querySelector(this.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+});
+
+})();
+</script>
+</body>
+</html>
