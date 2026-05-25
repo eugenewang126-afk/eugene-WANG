@@ -206,7 +206,7 @@
       <span class="hero-title-en" data-i18n-orig="Auxiliary Systems &amp; Network">Auxiliary Systems &amp; Network</span>
       <span class="hero-title-zh" data-i18n-orig="辅助系统及互联网络 · 四层自治金字塔架构">辅助系统及互联网络 · 四层自治金字塔架构</span>
     </h1>
-    <p class="hero-subtitle" data-i18n-orig="火星基地辅助系统的工程本质，不是地球工业互联网的简单移植，而是在通信时延3～22分钟、无GPS基础设施、GCR辐射持续轰击、能源极度有限四重边界下，构建一套能够完全自主感知、自主决策、自主执行的闭环智能系统。每一个传感器的选型、每一段网络的协议栈、每一台机器人的控制逻辑，都必须以"地球完全失联14天，系统仍能完美运行"为最低设计标准。">火星基地辅助系统的工程本质，不是地球工业互联网的简单移植，而是在通信时延3～22分钟、无GPS基础设施、GCR辐射持续轰击、能源极度有限四重边界下，构建一套能够完全自主感知、自主决策、自主执行的闭环智能系统。每一个传感器的选型、每一段网络的协议栈、每一台机器人的控制逻辑，都必须以"地球完全失联14天，系统仍能完美运行"为最低设计标准。</p>
+    <p class="hero-subtitle" data-i18n-orig="火星基地辅助系统的工程本质，不是地球工业互联网的简单移植，而是在通信时延3～22分钟、无GPS基础设施、GCR辐射持续轰击、能源极度有限四重边界下，构建一套能够完全自主感知、自主决策、自主执行的闭环智能系统。每一个传感器的选型、每一段网络的协议栈、每一台机器人的控制逻辑，都必须以\u2018地球完全失联14天，系统仍能完美运行\u2019为最低设计标准。">火星基地辅助系统的工程本质，不是地球工业互联网的简单移植，而是在通信时延3～22分钟、无GPS基础设施、GCR辐射持续轰击、能源极度有限四重边界下，构建一套能够完全自主感知、自主决策、自主执行的闭环智能系统。每一个传感器的选型、每一段网络的协议栈、每一台机器人的控制逻辑，都必须以\u2018地球完全失联14天，系统仍能完美运行\u2019为最低设计标准。</p>
     <div class="hero-stats">
       <div class="stat-item"><span class="stat-value">4</span><span class="stat-label">自治层级</span></div>
       <div class="stat-item"><span class="stat-value">3-22min</span><span class="stat-label">通信时延</span></div>
@@ -838,7 +838,7 @@ ipn:<span class="code-keyword">4</span>.999   <span class="code-comment">// Emer
     </table>
   </div>
 
-  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">C. 地球指令"死人开关"双重验证 / Dead Man's Switch</h3>
+  <h3 style="font-size:1.1rem;color:var(--text-primary);margin:2rem 0 1rem;">C. 地球指令\u2018死人开关\u2019双重验证 / Dead Man's Switch</h3>
   <div class="timeline">
     <div class="timeline-item"><div class="timeline-dot dot-green">1</div><div class="timeline-time">Step 1 · Earth → Mars</div><div class="timeline-content"><h4>BPSec签名 + HDTN加密</h4><p>地球DSN发出指令，BPSec端到端签名，HDTN加密传输。防止T4中继劫持。</p></div></div>
     <div class="timeline-item"><div class="timeline-dot dot-green">2</div><div class="timeline-time">Step 2 · Mars HDTN</div><div class="timeline-content"><h4>验证BPSec签名</h4><p>火星端HDTN网关验证签名完整性。签名不匹配→丢弃+告警。</p></div></div>
@@ -1171,7 +1171,7 @@ const EN_MAP = {
   "返回首页":"← Home",
   // Hero
   "辅助系统及互联网络 · 四层自治金字塔架构":"Auxiliary Systems & Network · Four-Layer Autonomous Pyramid",
-  "火星基地辅助系统的工程本质，不是地球工业互联网的简单移植，而是在通信时延3～22分钟、无GPS基础设施、GCR辐射持续轰击、能源极度有限四重边界下，构建一套能够完全自主感知、自主决策、自主执行的闭环智能系统。每一个传感器的选型、每一段网络的协议栈、每一台机器人的控制逻辑，都必须以"地球完全失联14天，系统仍能完美运行"为最低设计标准。":"The engineering essence of Mars base auxiliary systems is not a simple transplant of Earth's industrial internet, but building a closed-loop intelligent system capable of fully autonomous perception, decision, and execution under four boundary conditions: 3-22min communication delay, no GPS infrastructure, continuous GCR radiation bombardment, and extremely limited energy. Every sensor selection, every network protocol stack, every robot control logic must meet the minimum design standard of 'perfect operation for 14 days with complete Earth disconnection'.",
+  "火星基地辅助系统的工程本质，不是地球工业互联网的简单移植，而是在通信时延3～22分钟、无GPS基础设施、GCR辐射持续轰击、能源极度有限四重边界下，构建一套能够完全自主感知、自主决策、自主执行的闭环智能系统。每一个传感器的选型、每一段网络的协议栈、每一台机器人的控制逻辑，都必须以\u2018地球完全失联14天，系统仍能完美运行\u2019为最低设计标准。":"The engineering essence of Mars base auxiliary systems is not a simple transplant of Earth's industrial internet, but building a closed-loop intelligent system capable of fully autonomous perception, decision, and execution under four boundary conditions: 3-22min communication delay, no GPS infrastructure, continuous GCR radiation bombardment, and extremely limited energy. Every sensor selection, every network protocol stack, every robot control logic must meet the minimum design standard of 'perfect operation for 14 days with complete Earth disconnection'.",
   "自治层级":"Autonomy Layers","通信时延":"Comm Delay","传感节点":"Sensor Nodes","机器人类型":"Robot Classes","完全自治":"Full Autonomy",
   // Architecture
   "四层自治金字塔架构":"Four-Layer Autonomous Pyramid","设计公理：单层失效→下层必须维持生存；双层失效→L1必须保证生命支持":"Axiom: Single-layer failure → lower layer must sustain survival; Dual-layer failure → L1 must guarantee life support",
@@ -1194,7 +1194,7 @@ const EN_MAP = {
   "跨星际通信网络":"Inter-Planetary Network","火星-地球通信约束":"Mars-Earth Constraints","链路预算":"Link Budget",
   "HDTN 协议":"HDTN Protocol","合日生存包":"Solar Conjunction Survival","中继星座方案":"Relay Constellation",
   // Security
-  "基地网络安全体系":"Base Cybersecurity","威胁模型":"Threat Model","零信任架构":"Zero Trust Architecture","地球指令"死人开关"双重验证":"Dead Man's Switch Dual Verification",
+  "基地网络安全体系":"Base Cybersecurity","威胁模型":"Threat Model","零信任架构":"Zero Trust Architecture","地球指令\u2018死人开关\u2019双重验证":"Dead Man's Switch Dual Verification",
   // URS
   "能源-网络-机器人三系统协同":"Cross-Domain Resource Optimization","统一资源调度器":"Unified Resource Scheduler","尘暴完整时间线":"Dust Storm Complete Timeline",
   "生命支持（ECLSS）":"Life Support","安全（SHM+辐射监测）":"Safety","维护（机器人+修復）":"Maintenance","ISRU资源生产":"ISRU Production","科学研究":"Science","个人/非关键":"Personal/Non-critical",
