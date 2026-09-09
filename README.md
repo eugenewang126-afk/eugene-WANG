@@ -5,7 +5,7 @@
 
 ## 🔗 Live Demo
 
-[https://yourusername.github.io/mars-base-alpha/](https://yourusername.github.io/mars-base-alpha/)
+[https://eugenewang126-afk.github.io/eugene-WANG/](https://eugenewang126-afk.github.io/eugene-WANG/)
 
 ## 📋 Overview
 
@@ -22,8 +22,8 @@ This project presents a modular engineering design framework for a permanent Mar
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/mars-base-alpha.git
-cd mars-base-alpha
+git clone https://github.com/eugenewang126-afk/eugene-WANG.git
+cd eugene-WANG
 
 # Open in browser (any static server works)
 # Python
@@ -40,7 +40,7 @@ npx serve .
 1. Push this repository to GitHub
 2. Go to Settings → Pages
 3. Select `main` branch, root directory
-4. Your site will be live at `https://yourusername.github.io/mars-base-alpha/`
+4. Your site will be live at `https://eugenewang126-afk.github.io/eugene-WANG/`
 
 ## 📁 Project Structure
 
@@ -123,7 +123,7 @@ This means you are free to:
 
 ## 📧 Contact
 
-- **GitHub Issues**: [https://github.com/yourusername/mars-base-alpha/issues](https://github.com/yourusername/mars-base-alpha/issues)
+- **GitHub Issues**: [https://github.com/eugenewang126-afk/eugene-WANG/issues](https://github.com/eugenewang126-afk/eugene-WANG/issues)
 - **Email**: contact@marsbasealpha.org
 
 ## 🙏 Acknowledgments
